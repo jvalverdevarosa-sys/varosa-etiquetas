@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAROSA - Imprimir Etiquetas</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .screen-only {
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #4ecdc4;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 2rem;
+        }
+
+        .order-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .order-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .order-info-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .preview-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .preview-title {
+            color: #333;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .labels-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .print-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4ecdc4;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #3dbdb5;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .instructions {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .instructions h3 {
+            color: #4ecdc4;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions ol {
+            margin-left: 1.5rem;
+            color: #aaa;
+        }
+
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* =============================================
+           ESTILOS DE ETIQUETA
+           ============================================= */
+        .label {
+            width: 378px;
+            height: 189px;
+            background: #fff;
+            color: #000;
+            font-family: Arial, sans-serif;
+            border: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .label-header {
+            background: #fff;
+            color: #000;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000;
+        }
+
+        .label-header .logo {
+            font-weight: 900;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .label-header .ov-num {
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid #000;
+            padding: 2px 8px;
+        }
+
+        .label-body {
+            display: flex;
+            padding: 6px 8px;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-right: 8px;
+            border-right: 1px dashed #999;
+        }
+
+        .qr-section canvas {
+            width: 95px !important;
+            height: 95px !important;
+        }
+
+        .qr-label {
+            font-size: 6px;
+            color: #666;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+
+        .info-label {
+            font-size: 8px;
+            color: #555;
+            text-transform: uppercase;
+            min-width: 35px;
+        }
+
+        .info-value {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .info-value.route {
+            font-size: 12px;
+        }
+
+        .info-value.client {
+            font-size: 12px;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bulto-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 4px;
+            padding-top: 6px;
+            border-top: 1px solid #ddd;
+        }
+
+        .bulto-box {
+            border: 2px solid #000;
+            padding: 4px 14px;
+            font-size: 22px;
+            font-weight: 900;
+            text-align: center;
+            min-width: 45px;
+            background: #fff;
+        }
+
+        .bulto-de {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .label-footer {
+            background: #f0f0f0;
+            padding: 3px 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8px;
+            color: #555;
+            border-top: 1px solid #ccc;
+        }
+
+        /* =============================================
+           ESTILOS PARA IMPRESIÓN
+           ============================================= */
+        @media print {
+            .screen-only { display: none !important; }
+            body { background: #fff; margin: 0; padding: 0; }
+            .print-container { display: block !important; }
+
+            .label {
+                width: 100mm;
+                height: 50mm;
+                margin: 0;
+                padding: 0;
+                border: 1px solid #000;
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .label:last-child {
+                page-break-after: avoid;
+            }
+
+            .label-header .logo { font-size: 14pt; }
+            .label-header .ov-num { font-size: 12pt; }
+            .info-value.route { font-size: 11pt; }
+            .info-value.client { font-size: 11pt; }
+            .bulto-box { font-size: 18pt; padding: 3px 12px; }
+
+            .qr-section canvas {
+                width: 22mm !important;
+                height: 22mm !important;
+            }
+
+            @page {
+                size: 100mm 50mm;
+                margin: 0;
+            }
+        }
+
+        .print-container { display: none; }
+
+        /* Error state */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #ef4444;
+        }
+
+        .error-message h2 {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-only">
+        <h1>🖨️ Imprimir Etiquetas de Alisto</h1>
+        <p class="subtitle">Vista previa antes de imprimir</p>
+
+        <div id="content-area">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+
+    <div class="print-container" id="print-container"></div>
+
+    <script>
+        // =============================================
+        // LEER PARÁMETROS DE URL
+        // =============================================
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                ov: params.get('ov') || '',
+                cliente: params.get('cliente') || '',
+                ruta: params.get('ruta') || '',
+                fecha_ov: params.get('fecha_ov') || '',
+                cantidad_bultos: parseInt(params.get('bultos')) || 0,
+                usuario: params.get('usuario') || '',
+                observaciones: params.get('obs') || ''
+            };
+        }
+
+        // Datos del pedido (desde URL o demo)
+        let orderData = getUrlParams();
+
+        // Si no hay parámetros, usar datos de demostración
+        if (!orderData.ov) {
+            orderData = {
+                ov: "SO-08054",
+                cliente: "HOTEL MARGARITAS Y GIRASOLES",
+                ruta: "VENECIA - RIO CUARTO",
+                fecha_ov: "2025-12-05",
+                cantidad_bultos: 3,
+                usuario: "Maria B.",
+                observaciones: ""
+            };
+        }
+
+        // Agregar fecha de alisto (ahora)
+        orderData.fecha_alisto = new Date().toLocaleString('es-CR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // =============================================
+        // FUNCIONES DE GENERACIÓN
+        // =============================================
+        function createQRData(bultoActual) {
+            return JSON.stringify({
+                v: "1",
+                ov: orderData.ov,
+                cli: orderData.cliente,
+                rta: orderData.ruta,
+                fov: orderData.fecha_ov,
+                blt: orderData.cantidad_bultos,
+                n: bultoActual,
+                ali: orderData.fecha_alisto,
+                usr: orderData.usuario
+            });
+        }
+
+        function createLabelHTML(bultoActual, totalBultos, qrCanvasId) {
+            return `
+                <div class="label">
+                    <div class="label-header">
+                        <span class="logo">VAROSA</span>
+                        <span class="ov-num">${orderData.ov}</span>
+                    </div>
+                    <div class="label-body">
+                        <div class="qr-section">
+                            <canvas id="${qrCanvasId}"></canvas>
+                            <span class="qr-label">Escanear</span>
+                        </div>
+                        <div class="info-section">
+                            <div>
+                                <div class="info-row">
+                                    <span class="info-label">Ruta:</span>
+                                    <span class="info-value route">${orderData.ruta}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Cliente:</span>
+                                    <span class="info-value client">${orderData.cliente}</span>
+                                </div>
+                            </div>
+                            <div class="bulto-section">
+                                <div class="bulto-box">${bultoActual}</div>
+                                <span class="bulto-de">DE:</span>
+                                <div class="bulto-box">${totalBultos}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="label-footer">
+                        <span>📅 ${orderData.fecha_alisto}</span>
+                        <span>👤 ${orderData.usuario}</span>
+                        <span>OV: ${orderData.fecha_ov}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateContent() {
+            const contentArea = document.getElementById('content-area');
+
+            if (orderData.cantidad_bultos < 1) {
+                contentArea.innerHTML = `
+                    <div class="error-message">
+                        <h2>⚠️ Error</h2>
+                        <p>No se especificó la cantidad de bultos o es inválida.</p>
+                        <p>Verifique los parámetros e intente de nuevo.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Generar HTML de la página
+            contentArea.innerHTML = `
+                <div class="order-info">
+                    <div class="order-info-item">
+                        <span class="order-info-label">Orden de Venta</span>
+                        <span class="order-info-value">${orderData.ov}</span>
+                    </div>
+                    <div class="order-info-item">
+                        <span class="order-info-label">Cliente</span>
+                        <span class="order-info-value">${orderData.cliente}</span>
+                    </div>
+                    <div class="order-info-item">
+                        <span class="order-info-label">Ruta</span>
+                        <span class="order-info-value">${orderData.ruta}</span>
+                    </div>
+                    <div class="order-info-item">
+                        <span class="order-info-label">Cantidad de Bultos</span>
+                        <span class="order-info-value" style="color: #4ecdc4; font-size: 1.5rem;">${orderData.cantidad_bultos}</span>
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <div class="preview-title">Vista previa de ${orderData.cantidad_bultos} etiqueta(s) a imprimir:</div>
+                    <div class="labels-preview" id="labels-preview"></div>
+                </div>
+
+                <div class="print-actions">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        🖨️ Imprimir Etiquetas
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.close()">
+                        ✕ Cerrar
+                    </button>
+                </div>
+
+                <div class="instructions">
+                    <h3>📋 Instrucciones de impresión</h3>
+                    <ol>
+                        <li>Verifique que la impresora SATO esté encendida y con etiquetas</li>
+                        <li>Haga clic en <strong>"Imprimir Etiquetas"</strong></li>
+                        <li>Seleccione la impresora <strong>SATO CG408TT</strong></li>
+                        <li>Verifique tamaño de papel: <strong>100mm x 50mm</strong></li>
+                        <li>Márgenes: <strong>Ninguno</strong></li>
+                        <li>Haga clic en Imprimir</li>
+                    </ol>
+                </div>
+            `;
+
+            generateLabels();
+        }
+
+        function generateLabels() {
+            const previewContainer = document.getElementById('labels-preview');
+            const printContainer = document.getElementById('print-container');
+
+            if (!previewContainer) return;
+
+            let previewHTML = '';
+            let printHTML = '';
+
+            for (let i = 1; i <= orderData.cantidad_bultos; i++) {
+                previewHTML += createLabelHTML(i, orderData.cantidad_bultos, `qr-preview-${i}`);
+                printHTML += createLabelHTML(i, orderData.cantidad_bultos, `qr-print-${i}`);
+            }
+
+            previewContainer.innerHTML = previewHTML;
+            printContainer.innerHTML = printHTML;
+
+            // Generar QRs
+            const qrOptions = {
+                width: 95,
+                margin: 1,
+                color: { dark: '#000000', light: '#ffffff' }
+            };
+
+            for (let i = 1; i <= orderData.cantidad_bultos; i++) {
+                const qrData = createQRData(i);
+
+                const previewCanvas = document.getElementById(`qr-preview-${i}`);
+                if (previewCanvas) {
+                    QRCode.toCanvas(previewCanvas, qrData, qrOptions);
+                }
+
+                const printCanvas = document.getElementById(`qr-print-${i}`);
+                if (printCanvas) {
+                    QRCode.toCanvas(printCanvas, qrData, qrOptions);
+                }
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', generateContent);
+    </script>
+</body>
+</html>
