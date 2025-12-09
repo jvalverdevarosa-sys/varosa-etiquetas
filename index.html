@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VAROSA - Imprimir Etiquetas</title>
-    <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <script>
-        if (typeof QRCode === 'undefined') {
-            document.write('<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"><\/script>');
-        }
-    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -149,8 +143,8 @@
            ESTILOS DE ETIQUETA - 110mm x 25mm
            ============================================= */
         .label {
-            width: 416px;  /* 110mm a ~96dpi */
-            height: 94px;  /* 25mm a ~96dpi */
+            width: 416px;
+            height: 94px;
             background: #fff;
             color: #000;
             font-family: Arial, sans-serif;
@@ -174,9 +168,9 @@
             padding: 4px;
         }
 
-        .qr-section canvas {
-            width: 65px !important;
-            height: 65px !important;
+        .qr-image {
+            width: 65px;
+            height: 65px;
         }
 
         .qr-label {
@@ -327,9 +321,9 @@
                 width: 22mm;
             }
 
-            .qr-section canvas {
-                width: 18mm !important;
-                height: 18mm !important;
+            .qr-image {
+                width: 18mm;
+                height: 18mm;
             }
 
             .bulto-section {
@@ -425,20 +419,11 @@
         // FUNCIONES DE GENERACIÓN
         // =============================================
         function createQRData(bultoActual) {
-            return JSON.stringify({
-                v: "1",
-                ov: orderData.ov,
-                cli: orderData.cliente,
-                rta: orderData.ruta,
-                fov: orderData.fecha_ov,
-                blt: orderData.cantidad_bultos,
-                n: bultoActual,
-                ali: orderData.fecha_alisto,
-                usr: orderData.usuario
-            });
+            // Datos simplificados para el QR
+            return `${orderData.ov}|${bultoActual}/${orderData.cantidad_bultos}|${orderData.ruta}`;
         }
 
-        function createLabelHTML(bultoActual, totalBultos, qrCanvasId) {
+        function createLabelHTML(bultoActual, totalBultos, qrImgId) {
             // Mostrar notas solo si existen
             const notasHTML = orderData.notas 
                 ? `<div class="notas-row" title="${orderData.notas}">📝 ${orderData.notas}</div>` 
@@ -447,7 +432,7 @@
             return `
                 <div class="label">
                     <div class="qr-section">
-                        <canvas id="${qrCanvasId}"></canvas>
+                        <img id="${qrImgId}" class="qr-image" alt="QR" />
                         <span class="qr-label">Escanear</span>
                     </div>
                     <div class="main-section">
@@ -562,24 +547,19 @@
             previewContainer.innerHTML = previewHTML;
             printContainer.innerHTML = printHTML;
 
-            // Generar QRs
-            const qrOptions = {
-                width: 65,
-                margin: 1,
-                color: { dark: '#000000', light: '#ffffff' }
-            };
-
+            // Generar QRs usando Google Charts API
             for (let i = 1; i <= orderData.cantidad_bultos; i++) {
-                const qrData = createQRData(i);
+                const qrData = encodeURIComponent(createQRData(i));
+                const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${qrData}&choe=UTF-8`;
 
-                const previewCanvas = document.getElementById(`qr-preview-${i}`);
-                if (previewCanvas) {
-                    QRCode.toCanvas(previewCanvas, qrData, qrOptions);
+                const previewImg = document.getElementById(`qr-preview-${i}`);
+                if (previewImg) {
+                    previewImg.src = qrUrl;
                 }
 
-                const printCanvas = document.getElementById(`qr-print-${i}`);
-                if (printCanvas) {
-                    QRCode.toCanvas(printCanvas, qrData, qrOptions);
+                const printImg = document.getElementById(`qr-print-${i}`);
+                if (printImg) {
+                    printImg.src = qrUrl;
                 }
             }
         }
