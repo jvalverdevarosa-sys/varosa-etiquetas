@@ -550,7 +550,7 @@
             // Generar QRs usando Google Charts API
             for (let i = 1; i <= orderData.cantidad_bultos; i++) {
                 const qrData = encodeURIComponent(createQRData(i));
-                const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${qrData}&choe=UTF-8`;
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}`;
 
                 const previewImg = document.getElementById(`qr-preview-${i}`);
                 if (previewImg) {
