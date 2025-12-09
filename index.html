@@ -33,10 +33,15 @@
         .config-note h4 { color: #ffc107; margin-bottom: 0.5rem; }
         .config-note ul { margin-left: 1.5rem; color: #aaa; font-size: 0.9rem; }
 
-        /* ===== ETIQUETA: 101.6mm x 50.8mm (4" x 2") horizontal ===== */
-        .label {
+        /* ===== ETIQUETA EN PANTALLA: 101.6mm x 50.8mm (4" x 2") horizontal ===== */
+        .label-wrapper {
             width: 384px;      /* ~101.6mm en pantalla */
             height: 192px;     /* ~50.8mm en pantalla */
+        }
+        
+        .label {
+            width: 384px;
+            height: 192px;
             background: #fff;
             color: #000;
             font-family: Arial, sans-serif;
@@ -177,7 +182,7 @@
         }
         .bulto-de { font-size: 16px; font-weight: bold; }
 
-        /* ===== IMPRESIÓN ===== */
+        /* ===== IMPRESIÓN CON ROTACIÓN ===== */
         @media print {
             .screen-only { display: none !important; }
             
@@ -188,48 +193,79 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-        
+
             .print-container { 
                 display: block !important;
                 margin: 0;
                 padding: 0;
             }
-        
+
+            /* Contenedor que define el tamaño de página (vertical para la impresora) */
+            .label-wrapper {
+                width: 50.8mm;
+                height: 101.6mm;
+                overflow: hidden;
+                page-break-after: always;
+                break-after: page;
+                position: relative;
+            }
+            .label-wrapper:last-child {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Etiqueta rotada 90° para que quede horizontal en papel vertical */
             .label {
                 width: 101.6mm;
                 height: 50.8mm;
                 margin: 0;
                 padding: 0;
                 border: none;
-                page-break-after: always;
-                break-after: page;
+                position: absolute;
+                top: 50.8mm;
+                left: 0;
+                transform: rotate(-90deg);
+                transform-origin: top left;
             }
-            .label:last-child {
-                page-break-after: avoid;
-                break-after: avoid;
-            }
-        
+
             .qr-section { 
                 width: 26mm; 
                 border-right: 1px solid #000;
+                padding: 2mm;
             }
             .qr-image { width: 20mm; height: 20mm; }
+            .qr-label { font-size: 6pt; }
+            
+            .main-section {
+                padding: 2mm 3mm;
+            }
             
             .bulto-section { 
                 width: 24mm;
                 border-left: 1px solid #000;
+                padding: 2mm;
             }
             
-            .logo { font-size: 12pt; }
-            .ov-num { font-size: 11pt; border-width: 1px; }
-            .ruta-badge { font-size: 9pt; }
-            .cliente-value { font-size: 11pt; }
-            .notas-row { font-size: 8pt; }
-            .bulto-box { font-size: 22pt; border-width: 2px; padding: 2px 6px; }
-            .bulto-de { font-size: 12pt; }
-        
+            .header-row {
+                padding-bottom: 1.5mm;
+                margin-bottom: 1.5mm;
+                border-bottom: 1px solid #000;
+            }
+            
+            .logo { font-size: 11pt; }
+            .ov-num { font-size: 10pt; border-width: 1px; padding: 1px 4px; }
+            .ruta-badge { font-size: 8pt; padding: 1px 4px; }
+            .cliente-label { font-size: 7pt; }
+            .cliente-value { font-size: 10pt; }
+            .notas-row { font-size: 7pt; padding: 1mm 0; }
+            .alistador-row { font-size: 6pt; }
+            .bulto-label { font-size: 8pt; margin-bottom: 1.5mm; }
+            .bulto-box { font-size: 20pt; border-width: 2px; padding: 1px 5px; min-width: 8mm; }
+            .bulto-de { font-size: 11pt; }
+
+            /* Página configurada como vertical (2" x 4") - la impresora lo lee así */
             @page {
-                size: 101.6mm 50.8mm landscape;
+                size: 50.8mm 101.6mm;
                 margin: 0;
             }
         }
@@ -313,6 +349,41 @@
             var notasHtml = orderData.notas ? '<div class="notas-row">📝 ' + orderData.notas + '</div>' : '';
             var alistadorHtml = orderData.alistador ? '<div class="alistador-row">✓ Alistó: ' + orderData.alistador + '</div>' : '';
             
+            return '<div class="label-wrapper"><div class="label">' +
+                '<div class="qr-section">' +
+                    '<img class="qr-image" src="' + getQRUrl(qrData) + '" alt="QR">' +
+                    '<span class="qr-label">Escanear</span>' +
+                '</div>' +
+                '<div class="main-section">' +
+                    '<div class="header-row">' +
+                        '<span class="logo">VAROSA</span>' +
+                        '<span class="ov-num">' + orderData.ov + '</span>' +
+                        '<span class="ruta-badge">📍 ' + formatRuta(orderData.ruta) + '</span>' +
+                    '</div>' +
+                    '<div class="cliente-section">' +
+                        '<span class="cliente-label">Cliente:</span>' +
+                        '<span class="cliente-value">' + orderData.cliente + '</span>' +
+                    '</div>' +
+                    notasHtml +
+                    alistadorHtml +
+                '</div>' +
+                '<div class="bulto-section">' +
+                    '<span class="bulto-label">Bulto</span>' +
+                    '<div class="bulto-display">' +
+                        '<div class="bulto-box">' + bulto + '</div>' +
+                        '<span class="bulto-de">/</span>' +
+                        '<div class="bulto-box">' + total + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div></div>';
+        }
+
+        // Etiqueta para vista previa (sin wrapper)
+        function createLabelPreview(bulto, total) {
+            var qrData = createQRData(bulto, total);
+            var notasHtml = orderData.notas ? '<div class="notas-row">📝 ' + orderData.notas + '</div>' : '';
+            var alistadorHtml = orderData.alistador ? '<div class="alistador-row">✓ Alistó: ' + orderData.alistador + '</div>' : '';
+            
             return '<div class="label">' +
                 '<div class="qr-section">' +
                     '<img class="qr-image" src="' + getQRUrl(qrData) + '" alt="QR">' +
@@ -351,9 +422,11 @@
                 return;
             }
 
-            var labelsHtml = '';
+            var labelsPreviewHtml = '';
+            var labelsPrintHtml = '';
             for (var i = 1; i <= orderData.cantidad_bultos; i++) {
-                labelsHtml += createLabel(i, orderData.cantidad_bultos);
+                labelsPreviewHtml += createLabelPreview(i, orderData.cantidad_bultos);
+                labelsPrintHtml += createLabel(i, orderData.cantidad_bultos);
             }
 
             var sampleQRData = createQRData(1, orderData.cantidad_bultos);
@@ -369,14 +442,14 @@
                 '</div>' +
                 '<div class="preview-container">' +
                     '<div class="preview-title">Vista previa de ' + orderData.cantidad_bultos + ' etiqueta(s) - Tamaño: 101.6mm x 50.8mm (4" x 2")</div>' +
-                    '<div class="labels-preview">' + labelsHtml + '</div>' +
+                    '<div class="labels-preview">' + labelsPreviewHtml + '</div>' +
                 '</div>' +
                 '<div class="print-actions">' +
                     '<button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>' +
                     '<button class="btn btn-secondary" onclick="window.close()">✕ Cerrar</button>' +
                 '</div>' +
-                '<div class="config-note"><h4>⚙️ Configuración de impresión IMPORTANTE:</h4><ul>' +
-                    '<li><strong>Tamaño del papel:</strong> Custom 101.6mm x 50.8mm (o seleccionar 2x4 en SATO)</li>' +
+                '<div class="config-note"><h4>⚙️ Configuración de impresión:</h4><ul>' +
+                    '<li><strong>Tamaño del papel:</strong> 2" x 4" (50.8mm x 101.6mm) - La rotación se hace automáticamente</li>' +
                     '<li><strong>Márgenes:</strong> Ninguno</li>' +
                     '<li><strong>Escala:</strong> 100% (NO usar "Ajustar a página")</li>' +
                     '<li><strong>Encabezados y pies:</strong> Desactivado ✓</li>' +
@@ -384,14 +457,14 @@
                 '</ul></div>' +
                 '<div class="instructions"><h3>📋 Verificar antes de imprimir</h3><ol>' +
                     '<li>Impresora SATO encendida y con etiquetas cargadas</li>' +
-                    '<li>Seleccionar tamaño "2 x 4" o "USER" si configuraron custom</li>' +
-                    '<li>Si muestra más páginas de las esperadas, usar "Cuadro de diálogo del sistema" (Ctrl+Shift+P)</li>' +
+                    '<li>Seleccionar tamaño "2 x 4" en la impresora</li>' +
+                    '<li>La etiqueta se rotará automáticamente para imprimirse horizontal</li>' +
                 '</ol></div>' +
                 '<details class="debug-info"><summary>🔍 Ver contenido del QR (debug)</summary>' +
                     '<pre>' + JSON.stringify(sampleQRData, null, 2) + '</pre>' +
                 '</details>';
 
-            printContainer.innerHTML = labelsHtml;
+            printContainer.innerHTML = labelsPrintHtml;
         }
 
         document.addEventListener('DOMContentLoaded', init);
