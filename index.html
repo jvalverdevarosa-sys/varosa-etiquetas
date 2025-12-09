@@ -76,9 +76,9 @@
 
         .labels-preview {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 1rem;
-            justify-content: center;
+            align-items: center;
         }
 
         .print-actions {
@@ -141,63 +141,37 @@
         }
 
         /* =============================================
-           ESTILOS DE ETIQUETA
+           ESTILOS DE ETIQUETA - 110mm x 25mm
            ============================================= */
         .label {
-            width: 378px;
-            height: 189px;
+            width: 416px;  /* 110mm a ~96dpi */
+            height: 94px;  /* 25mm a ~96dpi */
             background: #fff;
             color: #000;
             font-family: Arial, sans-serif;
             border: 1px solid #000;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: stretch;
             page-break-inside: avoid;
             break-inside: avoid;
         }
 
-        .label-header {
-            background: #fff;
-            color: #000;
-            padding: 4px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #000;
-        }
-
-        .label-header .logo {
-            font-weight: 900;
-            font-size: 16px;
-            letter-spacing: 2px;
-        }
-
-        .label-header .ov-num {
-            font-weight: bold;
-            font-size: 14px;
-            border: 2px solid #000;
-            padding: 2px 8px;
-        }
-
-        .label-body {
-            display: flex;
-            padding: 6px 8px;
-            gap: 8px;
-            flex: 1;
-        }
-
+        /* Sección QR - izquierda */
         .qr-section {
+            width: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding-right: 8px;
-            border-right: 1px dashed #999;
+            border-right: 1px solid #000;
+            background: #fff;
+            padding: 4px;
         }
 
         .qr-section canvas {
-            width: 95px !important;
-            height: 95px !important;
+            width: 65px !important;
+            height: 65px !important;
         }
 
         .qr-label {
@@ -207,77 +181,119 @@
             text-transform: uppercase;
         }
 
-        .info-section {
+        /* Sección principal - centro */
+        .main-section {
             flex: 1;
             display: flex;
             flex-direction: column;
+            padding: 4px 8px;
             justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 3px;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .ov-num {
+            font-weight: bold;
+            font-size: 11px;
+            border: 1px solid #000;
+            padding: 1px 6px;
+            background: #000;
+            color: #fff;
+        }
+
+        .ruta-badge {
+            font-size: 9px;
+            font-weight: bold;
+            background: #f0f0f0;
+            padding: 1px 6px;
+            border-radius: 3px;
         }
 
         .info-row {
             display: flex;
-            align-items: baseline;
             gap: 4px;
-            margin-bottom: 2px;
+            align-items: baseline;
         }
 
         .info-label {
-            font-size: 8px;
-            color: #555;
+            font-size: 7px;
+            color: #666;
             text-transform: uppercase;
-            min-width: 35px;
         }
 
         .info-value {
+            font-size: 10px;
             font-weight: bold;
-            font-size: 11px;
-        }
-
-        .info-value.route {
-            font-size: 12px;
-        }
-
-        .info-value.client {
-            font-size: 12px;
-            max-width: 180px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
+        .cliente-row {
+            max-width: 220px;
+        }
+
+        .notas-row {
+            font-size: 8px;
+            color: #444;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+
+        /* Sección bultos - derecha */
         .bulto-section {
+            width: 85px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            margin-top: 4px;
-            padding-top: 6px;
-            border-top: 1px solid #ddd;
+            border-left: 1px solid #000;
+            background: #f8f8f8;
+            padding: 4px;
+        }
+
+        .bulto-label {
+            font-size: 7px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .bulto-display {
+            display: flex;
+            align-items: center;
+            gap: 3px;
         }
 
         .bulto-box {
             border: 2px solid #000;
-            padding: 4px 14px;
-            font-size: 22px;
+            padding: 2px 8px;
+            font-size: 20px;
             font-weight: 900;
             text-align: center;
-            min-width: 45px;
+            min-width: 30px;
             background: #fff;
         }
 
         .bulto-de {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
-        }
-
-        .label-footer {
-            background: #f0f0f0;
-            padding: 3px 8px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 8px;
-            color: #555;
-            border-top: 1px solid #ccc;
         }
 
         /* =============================================
@@ -289,8 +305,8 @@
             .print-container { display: block !important; }
 
             .label {
-                width: 100mm;
-                height: 50mm;
+                width: 110mm;
+                height: 25mm;
                 margin: 0;
                 padding: 0;
                 border: 1px solid #000;
@@ -302,19 +318,27 @@
                 page-break-after: avoid;
             }
 
-            .label-header .logo { font-size: 14pt; }
-            .label-header .ov-num { font-size: 12pt; }
-            .info-value.route { font-size: 11pt; }
-            .info-value.client { font-size: 11pt; }
-            .bulto-box { font-size: 18pt; padding: 3px 12px; }
-
-            .qr-section canvas {
-                width: 22mm !important;
-                height: 22mm !important;
+            .qr-section {
+                width: 22mm;
             }
 
+            .qr-section canvas {
+                width: 18mm !important;
+                height: 18mm !important;
+            }
+
+            .bulto-section {
+                width: 22mm;
+            }
+
+            .logo { font-size: 9pt; }
+            .ov-num { font-size: 9pt; }
+            .ruta-badge { font-size: 8pt; }
+            .info-value { font-size: 9pt; }
+            .bulto-box { font-size: 16pt; padding: 1px 6px; }
+
             @page {
-                size: 100mm 50mm;
+                size: 110mm 25mm;
                 margin: 0;
             }
         }
@@ -358,6 +382,7 @@
                 ov: params.get('ov') || '',
                 cliente: params.get('cliente') || '',
                 ruta: params.get('ruta') || '',
+                notas: params.get('notas') || '',
                 fecha_ov: params.get('fecha_ov') || '',
                 cantidad_bultos: parseInt(params.get('bultos')) || 0,
                 usuario: params.get('usuario') || '',
@@ -371,12 +396,13 @@
         // Si no hay parámetros, usar datos de demostración
         if (!orderData.ov) {
             orderData = {
-                ov: "SO-08054",
+                ov: "SO-03210",
                 cliente: "HOTEL MARGARITAS Y GIRASOLES",
                 ruta: "VENECIA - RIO CUARTO",
-                fecha_ov: "2025-12-05",
+                notas: "NO FACTURAR - ES UN PENDIENTE DE ENTREGA",
+                fecha_ov: "2025-12-08",
                 cantidad_bultos: 3,
-                usuario: "Maria B.",
+                usuario: "Bodega",
                 observaciones: ""
             };
         }
@@ -408,39 +434,36 @@
         }
 
         function createLabelHTML(bultoActual, totalBultos, qrCanvasId) {
+            // Mostrar notas solo si existen
+            const notasHTML = orderData.notas 
+                ? `<div class="notas-row" title="${orderData.notas}">📝 ${orderData.notas}</div>` 
+                : '';
+
             return `
                 <div class="label">
-                    <div class="label-header">
-                        <span class="logo">VAROSA</span>
-                        <span class="ov-num">${orderData.ov}</span>
+                    <div class="qr-section">
+                        <canvas id="${qrCanvasId}"></canvas>
+                        <span class="qr-label">Escanear</span>
                     </div>
-                    <div class="label-body">
-                        <div class="qr-section">
-                            <canvas id="${qrCanvasId}"></canvas>
-                            <span class="qr-label">Escanear</span>
+                    <div class="main-section">
+                        <div class="header-row">
+                            <span class="logo">VAROSA</span>
+                            <span class="ov-num">${orderData.ov}</span>
+                            <span class="ruta-badge">📍 ${orderData.ruta}</span>
                         </div>
-                        <div class="info-section">
-                            <div>
-                                <div class="info-row">
-                                    <span class="info-label">Ruta:</span>
-                                    <span class="info-value route">${orderData.ruta}</span>
-                                </div>
-                                <div class="info-row">
-                                    <span class="info-label">Cliente:</span>
-                                    <span class="info-value client">${orderData.cliente}</span>
-                                </div>
-                            </div>
-                            <div class="bulto-section">
-                                <div class="bulto-box">${bultoActual}</div>
-                                <span class="bulto-de">DE:</span>
-                                <div class="bulto-box">${totalBultos}</div>
-                            </div>
+                        <div class="info-row cliente-row">
+                            <span class="info-label">Cliente:</span>
+                            <span class="info-value" title="${orderData.cliente}">${orderData.cliente}</span>
                         </div>
+                        ${notasHTML}
                     </div>
-                    <div class="label-footer">
-                        <span>📅 ${orderData.fecha_alisto}</span>
-                        <span>👤 ${orderData.usuario}</span>
-                        <span>OV: ${orderData.fecha_ov}</span>
+                    <div class="bulto-section">
+                        <span class="bulto-label">Bulto</span>
+                        <div class="bulto-display">
+                            <div class="bulto-box">${bultoActual}</div>
+                            <span class="bulto-de">/</span>
+                            <div class="bulto-box">${totalBultos}</div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -479,6 +502,12 @@
                         <span class="order-info-label">Cantidad de Bultos</span>
                         <span class="order-info-value" style="color: #4ecdc4; font-size: 1.5rem;">${orderData.cantidad_bultos}</span>
                     </div>
+                    ${orderData.notas ? `
+                    <div class="order-info-item" style="grid-column: 1 / -1;">
+                        <span class="order-info-label">Notas</span>
+                        <span class="order-info-value" style="color: #ffa500;">${orderData.notas}</span>
+                    </div>
+                    ` : ''}
                 </div>
 
                 <div class="preview-container">
@@ -501,7 +530,7 @@
                         <li>Verifique que la impresora SATO esté encendida y con etiquetas</li>
                         <li>Haga clic en <strong>"Imprimir Etiquetas"</strong></li>
                         <li>Seleccione la impresora <strong>SATO CG408TT</strong></li>
-                        <li>Verifique tamaño de papel: <strong>100mm x 50mm</strong></li>
+                        <li>Verifique tamaño de papel: <strong>110mm x 25mm</strong></li>
                         <li>Márgenes: <strong>Ninguno</strong></li>
                         <li>Haga clic en Imprimir</li>
                     </ol>
@@ -530,7 +559,7 @@
 
             // Generar QRs
             const qrOptions = {
-                width: 95,
+                width: 65,
                 margin: 1,
                 color: { dark: '#000000', light: '#ffffff' }
             };
