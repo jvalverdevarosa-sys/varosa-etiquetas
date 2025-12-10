@@ -2,17 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Etiqueta VAROSA 4x2</title>
+<title>Etiquetas VAROSA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
     :root{
-        /* Etiqueta 4 x 2  (ancho x alto) */
-        --label-width: 101.6mm;   /* 4"  */
-        --label-height: 50.8mm;   /* 2"  */
+        --label-width: 101.6mm;
+        --label-height: 50.8mm;
         --padding: 2mm;
     }
 
-    /* ==== CONFIGURACIÓN DE PÁGINA PARA SATO (HORIZONTAL 4x2) ==== */
     @page{
         size: var(--label-width) var(--label-height);
         margin: 0;
@@ -35,169 +34,278 @@
     /* ======== SOLO PANTALLA ======== */
     @media screen{
         body{
-            background:#e5e7eb;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            padding:20px;
+            background: #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
         }
         .controles{
-            background:#fff;
-            padding:16px 20px;
-            border-radius:10px;
-            box-shadow:0 2px 10px rgba(0,0,0,.15);
-            margin-bottom:20px;
-            max-width:500px;
-            width:100%;
+            background: #fff;
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.15);
+            margin-bottom: 20px;
+            max-width: 500px;
+            width: 100%;
         }
         .controles h2{
-            margin-bottom:6px;
+            margin-bottom: 6px;
+            font-size: 18px;
         }
         .controles p{
-            font-size:13px;
-            color:#4b5563;
-            margin-bottom:8px;
+            font-size: 13px;
+            color: #4b5563;
+            margin-bottom: 12px;
         }
         .controles button{
-            background:#2563eb;
-            color:#fff;
-            border:none;
-            padding:8px 16px;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:13px;
-            margin-right:8px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
         }
-        .controles button.secondary{
-            background:#6b7280;
+        .controles button:hover{
+            background: #1d4ed8;
+        }
+        .config-box{
+            font-size: 11px;
+            margin-top: 12px;
+            background: #ecfdf5;
+            padding: 8px 10px;
+            border-radius: 5px;
+            border-left: 3px solid #10b981;
         }
         .etiquetas-container{
-            display:flex;
-            flex-direction:column;
-            gap:16px;
-            align-items:center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
         }
         .etiqueta-wrapper{
-            box-shadow:0 4px 15px rgba(0,0,0,.2);
-            background:#fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,.2);
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
         }
         .etiqueta-label{
-            background:#fef3c7;
-            padding:4px 10px;
-            font-size:11px;
-            font-weight:bold;
-            color:#92400e;
-            border-radius:5px 5px 0 0;
+            background: #fef3c7;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #92400e;
+            text-align: center;
         }
     }
 
     /* ======== SOLO IMPRESIÓN ======== */
     @media print{
         body{
-            background:#fff !important;
+            background: #fff !important;
+            padding: 0;
         }
         .controles,
         .etiqueta-label{
-            display:none !important;
+            display: none !important;
         }
         .etiquetas-container{
-            display:block;
+            display: block;
         }
         .etiqueta-wrapper{
-            width:var(--label-width);
-            height:var(--label-height);
-            page-break-after:always;
+            width: var(--label-width);
+            height: var(--label-height);
+            page-break-after: always;
+            box-shadow: none;
         }
         .etiqueta-wrapper:last-child{
-            page-break-after:avoid;
+            page-break-after: avoid;
         }
     }
 
     /* ======== DISEÑO DE LA ETIQUETA ======== */
     .etiqueta{
-        width:var(--label-width);
-        height:var(--label-height);
-        padding:var(--padding);
-        border-radius:1.5mm;
-        border:0.25mm solid #000;
-        display:flex;
-        flex-direction:column;
-        justify-content:space-between;
+        width: var(--label-width);
+        height: var(--label-height);
+        padding: var(--padding);
+        display: flex;
+        flex-direction: column;
+        background: #fff;
     }
 
-    /* Header: VAROSA + doc + fecha/hora */
+    /* Header: VAROSA + DOC + FECHA */
     .header{
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        gap:2mm;
-        margin-bottom:1mm;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-bottom: 1.5mm;
+        border-bottom: 0.4mm solid #000;
+        margin-bottom: 1.5mm;
     }
+
+    .header-left{
+        display: flex;
+        flex-direction: column;
+    }
+
     .empresa{
-        font-size:4mm;
-        font-weight:bold;
-        text-transform:uppercase;
-    }
-    .doc-box{
-        border:0.25mm solid #000;
-        padding:1mm 2mm;
-        font-size:2.2mm;
-        min-width:30mm;
-    }
-    .doc-line{
-        display:flex;
-        justify-content:space-between;
-    }
-    .doc-label{
-        font-weight:bold;
-        margin-right:1mm;
+        font-size: 5mm;
+        font-weight: bold;
+        letter-spacing: 0.3mm;
     }
 
-    /* Zona central datos */
-    .contenido{
-        flex:1;
-        margin-top:0.5mm;
-        margin-bottom:2mm;
-        font-size:3mm;
-        line-height:1.25;
+    .documento{
+        font-size: 4mm;
+        font-weight: bold;
+        color: #1f2937;
     }
+
+    .fecha-hora{
+        font-size: 2.5mm;
+        color: #6b7280;
+        margin-top: 0.5mm;
+    }
+
+    .header-right{
+        text-align: right;
+    }
+
+    .bultos-box{
+        display: flex;
+        gap: 1mm;
+    }
+
+    .bulto-item{
+        border: 0.3mm solid #000;
+        padding: 1mm 2mm;
+        text-align: center;
+        min-width: 10mm;
+    }
+
+    .bulto-item small{
+        display: block;
+        font-size: 2mm;
+        color: #6b7280;
+    }
+
+    .bulto-item .numero{
+        font-size: 4.5mm;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    /* Cuerpo: INFO + QR */
+    .body{
+        display: flex;
+        flex: 1;
+        gap: 2mm;
+    }
+
+    /* Lado izquierdo: datos */
+    .info{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+    }
+
     .campo{
-        margin-bottom:0.8mm;
-    }
-    .campo strong{
-        text-transform:uppercase;
-    }
-    .campo .valor{
-        font-weight:bold;
+        margin-bottom: 1mm;
     }
 
-    .linea{
-        border-top:0.25mm solid #000;
-        margin-top:0.8mm;
-        margin-bottom:0.8mm;
+    .campo-label{
+        font-size: 2.5mm;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.2mm;
     }
 
-    /* Pie: cajas de empaque */
+    .campo-valor{
+        font-size: 3.2mm;
+        font-weight: bold;
+        color: #000;
+        line-height: 1.2;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .campo-valor.cliente{
+        font-size: 3.5mm;
+    }
+
+    .campo-valor.ruta{
+        font-size: 3.2mm;
+        background: #f3f4f6;
+        padding: 0.8mm 1.5mm;
+        border-radius: 1mm;
+        display: inline-block;
+    }
+
+    .notas{
+        font-size: 2.8mm;
+        color: #dc2626;
+        background: #fef2f2;
+        padding: 1mm 2mm;
+        border-radius: 1mm;
+        border: 0.2mm solid #fecaca;
+        margin-top: 1mm;
+    }
+
+    .notas.hidden{
+        display: none;
+    }
+
+    /* Lado derecho: QR */
+    .qr-section{
+        width: 24mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-left: 0.3mm dashed #d1d5db;
+        padding-left: 2mm;
+    }
+
+    .qr-code{
+        width: 20mm;
+        height: 20mm;
+    }
+
+    .qr-code img,
+    .qr-code canvas{
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .qr-text{
+        font-size: 2mm;
+        color: #9ca3af;
+        margin-top: 1mm;
+        text-align: center;
+    }
+
+    /* Footer: Alistador */
     .footer{
-        display:flex;
-        justify-content:flex-end;
-        align-items:stretch;
-        gap:2mm;
-        margin-top:auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 0.3mm solid #e5e7eb;
+        padding-top: 1mm;
+        margin-top: auto;
+        font-size: 2.5mm;
     }
-    .box-nro{
-        border:0.25mm solid #000;
-        padding:1mm 3mm;
-        min-width:16mm;
-        text-align:center;
-        font-size:4mm;
-        font-weight:bold;
+
+    .alistador{
+        color: #374151;
     }
-    .box-nro small{
-        display:block;
-        font-size:2.4mm;
-        font-weight:normal;
-        margin-bottom:1mm;
+
+    .alistador strong{
+        color: #000;
     }
 </style>
 
@@ -205,19 +313,21 @@
 <body>
 
 <div class="controles">
-    <h2>Etiquetas VAROSA</h2>
-    <p>Se generará una etiqueta por cada bulto.</p>
-    <button onclick="window.print()">Imprimir todas</button>
-    <button class="secondary" onclick="cargarDemo()">Cargar demo</button>
-    <div style="font-size:12px;margin-top:8px;background:#ecfdf3;padding:6px;border-radius:4px;">
-        <strong>Chrome:</strong> Tamaño papel = 4 x 2 (101.6 × 50.8 mm) · Márgenes = Ninguno · Escala = 100%
+    <h2>🏷️ Etiquetas VAROSA</h2>
+    <p id="infoPagina">Se generará una etiqueta por cada bulto.</p>
+    <div>
+        <button onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+    <div class="config-box">
+        <strong>⚙️ Configuración Chrome:</strong> 
+        Tamaño = User defined (101.6 × 50.8 mm) · Márgenes = Ninguno · Escala = 100%
     </div>
 </div>
 
 <div id="etiquetasContainer" class="etiquetas-container"></div>
 
 <script>
-    // ==== MAPEO DE USUARIOS / ALISTADORES ====
+    // ==== MAPEO DE USUARIOS ====
     const mapeoUsuarios = {
         "auxiliarbodegavarosa": "Anthony Nuñez",
         "auxiliarbodegavarosa1": "Andrés Otéro",
@@ -228,124 +338,157 @@
 
     function obtenerNombreUsuario(username) {
         if (!username) return "Sin asignar";
-        const usernameLimpio = username.trim().toLowerCase();
-        for (const [key, nombre] of Object.entries(mapeoUsuarios)) {
-            if (
-                usernameLimpio === key.toLowerCase() ||
-                usernameLimpio.includes(key.toLowerCase())
-            ) {
+        const key = username.trim().toLowerCase();
+        for (const [u, nombre] of Object.entries(mapeoUsuarios)) {
+            if (key === u.toLowerCase() || key.includes(u.toLowerCase())) {
                 return nombre;
             }
         }
         return username;
     }
 
-    // --- Datos DEMO ---
-    const demo = {
-        empresa: "VAROSA",
-        documento: "SO-08194",
-        fecha: "09/12/2025",
-        hora: "07:11 p.m.",
-        ruta: "FORTUNA - CASTILLO",
-        cliente: "NAYARA HOTELS SRL",
-        nota: "",
-        alistador: obtenerNombreUsuario("auxiliarbodegavarosa1"),
-        totalBultos: 3
-    };
+    // ==== CREAR ETIQUETA ====
+    function crearEtiqueta(datos, nroBulto) {
+        const notasClass = datos.notas ? '' : 'hidden';
+        const notasHTML = datos.notas ? `⚠️ ${datos.notas}` : '';
 
-    // Generar una etiqueta HTML para un bulto
-    function crearEtiqueta(datos, nroBulto){
         return `
         <div class="etiqueta-wrapper">
-            <div class="etiqueta-label">Etiqueta ${nroBulto} de ${datos.totalBultos}</div>
+            <div class="etiqueta-label">📦 Etiqueta ${nroBulto} de ${datos.totalBultos}</div>
             <div class="etiqueta">
+                
                 <div class="header">
-                    <div class="empresa">${datos.empresa}</div>
-                    <div class="doc-box">
-                        <div class="doc-line">
-                            <span class="doc-label">DOC:</span>
-                            <span>${datos.documento}</span>
-                        </div>
-                        <div class="doc-line">
-                            <span class="doc-label">FECHA:</span>
-                            <span>${datos.fecha}</span>
-                        </div>
-                        <div class="doc-line">
-                            <span class="doc-label">HORA:</span>
-                            <span>${datos.hora}</span>
+                    <div class="header-left">
+                        <div class="empresa">VAROSA</div>
+                        <div class="documento">${datos.documento}</div>
+                        <div class="fecha-hora">${datos.fecha} ${datos.hora}</div>
+                    </div>
+                    <div class="header-right">
+                        <div class="bultos-box">
+                            <div class="bulto-item">
+                                <small>BULTO</small>
+                                <div class="numero">${nroBulto}</div>
+                            </div>
+                            <div class="bulto-item">
+                                <small>DE</small>
+                                <div class="numero">${datos.totalBultos}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="contenido">
-                    <div class="campo">
-                        <strong>Ruta: </strong>
-                        <span class="valor">${datos.ruta}</span>
+                <div class="body">
+                    <div class="info">
+                        <div>
+                            <div class="campo">
+                                <div class="campo-label">Cliente</div>
+                                <div class="campo-valor cliente">${datos.cliente}</div>
+                            </div>
+                            <div class="campo">
+                                <div class="campo-label">Ruta</div>
+                                <div class="campo-valor ruta">${datos.ruta}</div>
+                            </div>
+                        </div>
+                        <div class="notas ${notasClass}">${notasHTML}</div>
                     </div>
-                    <div class="campo">
-                        <strong>Cliente: </strong>
-                        <span class="valor">${datos.cliente}</span>
+                    <div class="qr-section">
+                        <div class="qr-code" id="qr-${nroBulto}"></div>
+                        <div class="qr-text">Escanear</div>
                     </div>
-                    <div class="campo">
-                        <strong>Alistador: </strong>
-                        <span class="valor">${datos.alistador}</span>
-                    </div>
-                    ${datos.nota ? `
-                    <div class="campo">
-                        <strong>Nota: </strong>
-                        <span class="valor">${datos.nota}</span>
-                    </div>` : ""}
-                    <div class="linea"></div>
                 </div>
 
                 <div class="footer">
-                    <div class="box-nro">
-                        <small>EMPAQUE</small>
-                        ${nroBulto}
-                    </div>
-                    <div class="box-nro">
-                        <small>DE</small>
-                        ${datos.totalBultos}
-                    </div>
+                    <div class="alistador">Alistó: <strong>${datos.alistador}</strong></div>
                 </div>
+
             </div>
         </div>`;
     }
 
-    function generarEtiquetas(datos){
-        const cont = document.getElementById("etiquetasContainer");
-        cont.innerHTML = "";
-        for(let i=1;i<=datos.totalBultos;i++){
-            cont.insertAdjacentHTML("beforeend", crearEtiqueta(datos, i));
+    // ==== GENERAR QR ====
+    function generarQR(elementId, datos, nroBulto) {
+        const qrData = JSON.stringify({
+            ov: datos.documento,
+            b: `${nroBulto}/${datos.totalBultos}`,
+            c: datos.cliente.substring(0, 30),
+            r: datos.ruta.substring(0, 20)
+        });
+
+        const element = document.getElementById(elementId);
+        if (element) {
+            new QRCode(element, {
+                text: qrData,
+                width: 80,
+                height: 80,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
         }
     }
 
-    function cargarDemo(){
-        generarEtiquetas(demo);
+    // ==== GENERAR TODAS LAS ETIQUETAS ====
+    function generarEtiquetas(datos) {
+        const container = document.getElementById("etiquetasContainer");
+        container.innerHTML = "";
+
+        for (let i = 1; i <= datos.totalBultos; i++) {
+            container.insertAdjacentHTML("beforeend", crearEtiqueta(datos, i));
+        }
+
+        // Generar QRs después de insertar el HTML
+        setTimeout(() => {
+            for (let i = 1; i <= datos.totalBultos; i++) {
+                generarQR(`qr-${i}`, datos, i);
+            }
+        }, 100);
+
+        // Actualizar info
+        document.getElementById("infoPagina").textContent = 
+            `${datos.totalBultos} etiqueta(s) para: ${datos.cliente}`;
     }
 
-    // Cargar datos desde la URL como en tu versión original
-    function cargarDesdeURL(){
+    // ==== CARGAR DESDE URL ====
+    function cargarDesdeURL() {
         const p = new URLSearchParams(window.location.search);
-        if(!p.has("ov")){
-            generarEtiquetas(demo);
+
+        // Si no hay parámetros, cargar demo
+        if (!p.has("ov")) {
+            generarEtiquetas({
+                documento: "SO-08194",
+                fecha: "09/12/2025",
+                hora: "07:15 p.m.",
+                ruta: "FORTUNA - CASTILLO",
+                cliente: "NAYARA HOTELS SRL",
+                notas: "",
+                alistador: obtenerNombreUsuario("auxiliarbodegavarosa1"),
+                totalBultos: 2
+            });
             return;
         }
+
+        // Obtener fecha/hora actual si no viene en URL
+        const ahora = new Date();
+        const fechaDefault = ahora.toLocaleDateString('es-CR');
+        const horaDefault = ahora.toLocaleTimeString('es-CR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+
         const total = parseInt(p.get("bultos") || "1", 10);
         const alistadorRaw = p.get("alistador") || p.get("user") || "";
-        const alistadorNombre = obtenerNombreUsuario(alistadorRaw);
 
         const datos = {
-            empresa: "VAROSA",
             documento: p.get("ov") || "",
-            fecha: p.get("fecha") || "",
-            hora: p.get("hora")  || "",
-            ruta: p.get("ruta")  || "",
+            fecha: p.get("fecha") || fechaDefault,
+            hora: p.get("hora") || horaDefault,
+            ruta: p.get("ruta") || "",
             cliente: p.get("cliente") || "",
-            nota: p.get("notas") || "",
-            alistador: alistadorNombre,
+            notas: p.get("notas") || "",
+            alistador: obtenerNombreUsuario(alistadorRaw),
             totalBultos: isNaN(total) ? 1 : total
         };
+
         generarEtiquetas(datos);
     }
 
