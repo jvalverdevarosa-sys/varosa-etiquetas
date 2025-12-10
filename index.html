@@ -411,39 +411,26 @@
         "luisrodrguezjimnez1":   "Luis Rodríguez Jiménez"
     };
 
-    function obtenerNombreUsuario(username) {
-        if (!username) return "Sin asignar";
-
-        const keyFull = username.trim().toLowerCase();
-        const key = keyFull.split('@')[0]; // quitar dominio si es correo
-
-        let mejorCoincidencia = null;
-        let mejorLongitud = 0;
-
-        for (const [u, nombre] of Object.entries(mapeoUsuarios)) {
-            const clave = u.toLowerCase();
-
-            // coincidencia exacta
-            if (key === clave) {
-                return nombre;
+        function obtenerNombreUsuario(username) {
+            if (!username) return "Sin asignar";
+        
+            // Normalizar: quitar dominio si viene un correo
+            const key = username.trim().toLowerCase().split('@')[0];
+        
+            // Buscar coincidencia exacta dentro del mapa
+            if (mapeoUsuarios[key]) {
+                return mapeoUsuarios[key];
             }
-
-            // coincidencia parcial: elegimos la más larga (más específica)
-            if (keyFull.includes(clave) || key.includes(clave)) {
-                if (clave.length > mejorLongitud) {
-                    mejorLongitud = clave.length;
-                    mejorCoincidencia = nombre;
-                }
+        
+            // Si ya viene un nombre completo (tiene espacio)
+            if (username.includes(" ")) {
+                return username;
             }
+        
+            // Si no coincide nada, devolvemos esto:
+            return "Sin asignar";
         }
 
-        if (mejorCoincidencia) return mejorCoincidencia;
-
-        // si ya viene un nombre con espacios, lo usamos
-        if (username.includes(" ")) return username;
-
-        return "Sin asignar";
-    }
 
     // ==== CREAR ETIQUETA ====
     function crearEtiqueta(datos, nroBulto) {
