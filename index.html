@@ -2,17 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Etiqueta VAROSA 2x4</title>
+<title>Etiqueta VAROSA 4x2</title>
 
 <style>
     :root{
-        /* Etiqueta 2 x 4  (ancho x alto) */
-        --label-width: 50.8mm;   /* 2"  */
-        --label-height: 101.6mm; /* 4"  */
+        /* Etiqueta 4 x 2  (ancho x alto) */
+        --label-width: 101.6mm;   /* 4"  */
+        --label-height: 50.8mm;   /* 2"  */
         --padding: 2mm;
     }
 
-    /* ==== CONFIGURACIÓN DE PÁGINA PARA SATO ==== */
+    /* ==== CONFIGURACIÓN DE PÁGINA PARA SATO (HORIZONTAL 4x2) ==== */
     @page{
         size: var(--label-width) var(--label-height);
         margin: 0;
@@ -131,7 +131,7 @@
         justify-content:space-between;
         align-items:flex-start;
         gap:2mm;
-        margin-bottom:1.5mm;
+        margin-bottom:1mm;
     }
     .empresa{
         font-size:4mm;
@@ -142,7 +142,7 @@
         border:0.25mm solid #000;
         padding:1mm 2mm;
         font-size:2.2mm;
-        min-width:22mm;
+        min-width:30mm;
     }
     .doc-line{
         display:flex;
@@ -156,13 +156,13 @@
     /* Zona central datos */
     .contenido{
         flex:1;
-        margin-top:1mm;
-        margin-bottom:3mm;
-        font-size:3.2mm;
+        margin-top:0.5mm;
+        margin-bottom:2mm;
+        font-size:3mm;
         line-height:1.25;
     }
     .campo{
-        margin-bottom:1mm;
+        margin-bottom:0.8mm;
     }
     .campo strong{
         text-transform:uppercase;
@@ -171,11 +171,10 @@
         font-weight:bold;
     }
 
-    /* Línea separadora */
     .linea{
         border-top:0.25mm solid #000;
-        margin-top:1mm;
-        margin-bottom:1mm;
+        margin-top:0.8mm;
+        margin-bottom:0.8mm;
     }
 
     /* Pie: cajas de empaque */
@@ -189,7 +188,7 @@
     .box-nro{
         border:0.25mm solid #000;
         padding:1mm 3mm;
-        min-width:14mm;
+        min-width:16mm;
         text-align:center;
         font-size:4mm;
         font-weight:bold;
@@ -211,23 +210,47 @@
     <button onclick="window.print()">Imprimir todas</button>
     <button class="secondary" onclick="cargarDemo()">Cargar demo</button>
     <div style="font-size:12px;margin-top:8px;background:#ecfdf3;padding:6px;border-radius:4px;">
-        <strong>Chrome:</strong> Tamaño papel = 2 x 4 (50.8 × 101.6 mm) · Márgenes = Ninguno · Escala = 100%
+        <strong>Chrome:</strong> Tamaño papel = 4 x 2 (101.6 × 50.8 mm) · Márgenes = Ninguno · Escala = 100%
     </div>
 </div>
 
 <div id="etiquetasContainer" class="etiquetas-container"></div>
 
 <script>
+    // ==== MAPEO DE USUARIOS / ALISTADORES ====
+    const mapeoUsuarios = {
+        "auxiliarbodegavarosa": "Anthony Nuñez",
+        "auxiliarbodegavarosa1": "Andrés Otéro",
+        "auxiliarbodegavarosa2": "Orlando Contreras",
+        "auxiliarbodegavarosa3": "Michael Arce",
+        "luisrodrguezjimnez1": "Luis Rodríguez Jiménez"
+    };
+
+    function obtenerNombreUsuario(username) {
+        if (!username) return "Sin asignar";
+        const usernameLimpio = username.trim().toLowerCase();
+        for (const [key, nombre] of Object.entries(mapeoUsuarios)) {
+            if (
+                usernameLimpio === key.toLowerCase() ||
+                usernameLimpio.includes(key.toLowerCase())
+            ) {
+                return nombre;
+            }
+        }
+        return username;
+    }
+
     // --- Datos DEMO ---
     const demo = {
         empresa: "VAROSA",
-        documento: "SO-08165",
+        documento: "SO-08194",
         fecha: "09/12/2025",
-        hora: "09:22",
-        ruta: "CIUDAD QUESADA",
-        cliente: "COMERCIALIZADORA VARO S.A",
+        hora: "07:11 p.m.",
+        ruta: "FORTUNA - CASTILLO",
+        cliente: "NAYARA HOTELS SRL",
         nota: "",
-        totalBultos: 2
+        alistador: obtenerNombreUsuario("auxiliarbodegavarosa1"),
+        totalBultos: 3
     };
 
     // Generar una etiqueta HTML para un bulto
@@ -263,6 +286,10 @@
                         <strong>Cliente: </strong>
                         <span class="valor">${datos.cliente}</span>
                     </div>
+                    <div class="campo">
+                        <strong>Alistador: </strong>
+                        <span class="valor">${datos.alistador}</span>
+                    </div>
                     ${datos.nota ? `
                     <div class="campo">
                         <strong>Nota: </strong>
@@ -297,7 +324,7 @@
         generarEtiquetas(demo);
     }
 
-    // Si quieres cargar desde la URL como ya hacías:
+    // Cargar datos desde la URL como en tu versión original
     function cargarDesdeURL(){
         const p = new URLSearchParams(window.location.search);
         if(!p.has("ov")){
@@ -305,6 +332,9 @@
             return;
         }
         const total = parseInt(p.get("bultos") || "1", 10);
+        const alistadorRaw = p.get("alistador") || p.get("user") || "";
+        const alistadorNombre = obtenerNombreUsuario(alistadorRaw);
+
         const datos = {
             empresa: "VAROSA",
             documento: p.get("ov") || "",
@@ -313,6 +343,7 @@
             ruta: p.get("ruta")  || "",
             cliente: p.get("cliente") || "",
             nota: p.get("notas") || "",
+            alistador: alistadorNombre,
             totalBultos: isNaN(total) ? 1 : total
         };
         generarEtiquetas(datos);
