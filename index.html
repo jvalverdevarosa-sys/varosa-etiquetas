@@ -11,14 +11,15 @@
         --varosa-azul-oscuro: #1a365d;
         --varosa-azul: #2563eb;
         --varosa-cyan: #0891b2;
-        --varosa-cyan-light: #22d3ee;
         --varosa-gris: #64748b;
         --varosa-gris-light: #f1f5f9;
 
+        /* Tamaño de la etiqueta física */
         --label-width: 101.6mm;
         --label-height: 50.8mm;
+
         --padding: 2mm;
-        --label-top-safe: 3mm; /* margen extra superior dentro de la etiqueta */
+        --label-top-safe: 5mm; /* espacio extra interno arriba */
     }
 
     @page{
@@ -56,7 +57,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,.2);
             margin-bottom: 24px;
-            max-width: 500px;
+            max-width: 520px;
             width: 100%;
         }
         .controles-header{
@@ -67,7 +68,7 @@
         }
         .logo-text{
             font-size: 24px;
-            font-weight: bold;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--varosa-azul-oscuro) 0%, var(--varosa-cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -76,7 +77,7 @@
         .controles h2{
             font-size: 16px;
             color: var(--varosa-gris);
-            font-weight: normal;
+            font-weight: 600;
         }
         .controles p{
             font-size: 13px;
@@ -124,7 +125,7 @@
         }
         .etiqueta-label{
             background: linear-gradient(135deg, var(--varosa-azul-oscuro) 0%, var(--varosa-cyan) 100%);
-            padding: 8px 16px;
+            padding: 6px 16px;
             font-size: 12px;
             font-weight: 600;
             color: #fff;
@@ -149,7 +150,9 @@
             width: var(--label-width);
             height: var(--label-height);
             page-break-after: always;
-            box-shadow: none;
+            box-shadow: none !important;
+            margin: 0;
+            padding: 0;
         }
         .etiqueta-wrapper:last-child{
             page-break-after: avoid;
@@ -161,20 +164,20 @@
         width: var(--label-width);
         height: var(--label-height);
         padding: var(--padding);
-        padding-top: calc(var(--padding) + var(--label-top-safe)); /* baja todo el contenido */
+        padding-top: calc(var(--padding) + var(--label-top-safe));
         display: flex;
         flex-direction: column;
         background: #fff;
     }
 
-    /* Header con banda de color */
+    /* Header */
     .header{
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding-bottom: 1.5mm;
+        padding-bottom: 1.2mm;
         border-bottom: 0.6mm solid var(--varosa-azul-oscuro);
-        margin-bottom: 1.5mm;
+        margin-bottom: 1.2mm;
     }
 
     .header-left{
@@ -190,16 +193,16 @@
     }
 
     .documento{
-        font-size: 3.8mm;
+        font-size: 4mm;
         font-weight: 800;
-        color: var(--varosa-cyan);
+        color: var(--varosa-azul);
     }
 
     .fecha-hora{
         font-size: 2.4mm;
-        color: #111827;
+        color: #000;
         margin-top: 0.3mm;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .header-right{
@@ -217,6 +220,7 @@
         text-align: center;
         min-width: 11mm;
         background: #fff;
+        font-weight: 700;
     }
 
     .bulto-item:first-child{
@@ -236,9 +240,9 @@
 
     .bulto-item small{
         display: block;
-        font-size: 1.8mm;
-        color: var(--varosa-gris);
-        font-weight: 600;
+        font-size: 1.9mm;
+        color: #000;
+        font-weight: 700;
     }
 
     .bulto-item .numero{
@@ -248,14 +252,13 @@
         color: var(--varosa-azul-oscuro);
     }
 
-    /* Cuerpo: INFO + QR */
+    /* Cuerpo */
     .body{
         display: flex;
         flex: 1;
         gap: 2mm;
     }
 
-    /* Lado izquierdo: datos */
     .info{
         flex: 1;
         display: flex;
@@ -269,16 +272,16 @@
     }
 
     .campo-label{
-        font-size: 2.4mm;
-        color: #111827;
+        font-size: 2.3mm;
+        color: #000;
         text-transform: uppercase;
-        letter-spacing: 0.2mm;
-        font-weight: 700;
+        letter-spacing: 0.3mm;
+        font-weight: 700 !important;
     }
 
     .campo-valor{
-        font-size: 3.4mm;
-        font-weight: 700;
+        font-size: 3.2mm;
+        font-weight: 700 !important;
         color: #000;
         line-height: 1.25;
         overflow: hidden;
@@ -288,37 +291,37 @@
     }
 
     .campo-valor.cliente{
-        font-size: 3.6mm;
-        font-weight: 700;
-        color: #000;
+        font-size: 3.5mm;
+        font-weight: 800 !important;
     }
 
     .campo-valor.ruta{
         font-size: 3mm;
-        background: var(--varosa-azul-oscuro);
-        color: #fff;
-        padding: 1mm 2mm;
+        background: #fff;
+        color: #000;
+        padding: 0.8mm 2mm;
         border-radius: 1mm;
+        border: 0.5mm solid #000;
         display: inline-block;
-        font-weight: 600;
+        font-weight: 800 !important;
     }
 
     .notas{
-        font-size: 2.6mm;
+        font-size: 2.7mm;
         color: #b91c1c;
         background: #fef2f2;
         padding: 1.2mm 2mm;
         border-radius: 1mm;
         border-left: 0.6mm solid #ef4444;
         margin-top: 1mm;
-        font-weight: 500;
+        font-weight: 700;
     }
 
     .notas.hidden{
         display: none;
     }
 
-    /* Lado derecho: QR */
+    /* QR */
     .qr-section{
         width: 24mm;
         display: flex;
@@ -341,15 +344,16 @@
     }
 
     .qr-text{
-        font-size: 1.8mm;
-        color: varosa-gris;
+        font-size: 2mm;
+        color: #000;
         margin-top: 0.8mm;
         text-align: center;
         text-transform: uppercase;
         letter-spacing: 0.2mm;
+        font-weight: 700;
     }
 
-    /* Footer: Alistador */
+    /* Footer */
     .footer{
         display: flex;
         justify-content: space-between;
@@ -357,24 +361,27 @@
         border-top: 0.3mm solid #e2e8f0;
         padding-top: 1mm;
         margin-top: auto;
-        font-size: 2.4mm;
+        font-size: 2.5mm;
     }
 
     .alistador{
-        color: var(--varosa-gris);
+        color: #000;
+        font-weight: 700 !important;
     }
 
     .alistador strong{
-        color: var(--varosa-azul-oscuro);
+        color: #000;
+        font-weight: 800 !important;
     }
 
     .powered{
-        font-size: 1.8mm;
+        font-size: 2mm;
         color: #94a3b8;
+        font-weight: 700;
     }
 </style>
-
 </head>
+
 <body>
 
 <div class="controles">
@@ -397,28 +404,44 @@
 <script>
     // ==== MAPEO DE USUARIOS ====
     const mapeoUsuarios = {
-        "auxiliarbodegavarosa": "Anthony Nuñez",
+        "auxiliarbodegavarosa":  "Anthony Nuñez",
         "auxiliarbodegavarosa1": "Andrés Otéro",
         "auxiliarbodegavarosa2": "Orlando Contreras",
         "auxiliarbodegavarosa3": "Michael Arce",
-        "luisrodrguezjimnez1": "Luis Rodríguez Jiménez"
+        "luisrodrguezjimnez1":   "Luis Rodríguez Jiménez"
     };
 
     function obtenerNombreUsuario(username) {
         if (!username) return "Sin asignar";
-    
-        // normalizar
+
         const keyFull = username.trim().toLowerCase();
         const key = keyFull.split('@')[0]; // quitar dominio si es correo
-    
-        // buscar coincidencia exacta
+
+        let mejorCoincidencia = null;
+        let mejorLongitud = 0;
+
         for (const [u, nombre] of Object.entries(mapeoUsuarios)) {
-            if (key === u.toLowerCase()) {
+            const clave = u.toLowerCase();
+
+            // coincidencia exacta
+            if (key === clave) {
                 return nombre;
             }
+
+            // coincidencia parcial: elegimos la más larga (más específica)
+            if (keyFull.includes(clave) || key.includes(clave)) {
+                if (clave.length > mejorLongitud) {
+                    mejorLongitud = clave.length;
+                    mejorCoincidencia = nombre;
+                }
+            }
         }
-    
-        // si no encuentra, mejor mostrar "Sin asignar"
+
+        if (mejorCoincidencia) return mejorCoincidencia;
+
+        // si ya viene un nombre con espacios, lo usamos
+        if (username.includes(" ")) return username;
+
         return "Sin asignar";
     }
 
@@ -429,7 +452,7 @@
 
         return `
         <div class="etiqueta-wrapper">
-            <div class="etiqueta-label">📦 Etiqueta ${nroBulto} de ${datos.totalBultos} — ${datos.documento}</div>
+            <div class="etiqueta-label">Etiqueta ${nroBulto} de ${datos.totalBultos} — ${datos.documento}</div>
             <div class="etiqueta">
 
                 <div class="header">
@@ -496,7 +519,7 @@
                 text: qrData,
                 width: 80,
                 height: 80,
-                colorDark: "#1a365d",
+                colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.M
             });
@@ -512,14 +535,12 @@
             container.insertAdjacentHTML("beforeend", crearEtiqueta(datos, i));
         }
 
-        // Generar QRs después de insertar el HTML
         setTimeout(() => {
             for (let i = 1; i <= datos.totalBultos; i++) {
                 generarQR(`qr-${i}`, datos, i);
             }
         }, 100);
 
-        // Actualizar info
         const bultoText = datos.totalBultos === 1 ? 'etiqueta' : 'etiquetas';
         document.getElementById("infoPagina").innerHTML =
             `📦 <strong>${datos.totalBultos}</strong> ${bultoText} para: <strong>${datos.cliente}</strong>`;
@@ -529,8 +550,8 @@
     function cargarDesdeURL() {
         const p = new URLSearchParams(window.location.search);
 
-        // Si no hay parámetros, cargar demo
         if (!p.has("ov")) {
+            // Demo por si se abre sin parámetros
             generarEtiquetas({
                 documento: "SO-08194",
                 fecha: "09/12/2025",
@@ -544,7 +565,6 @@
             return;
         }
 
-        // Obtener fecha/hora actual si no viene en URL
         const ahora = new Date();
         const fechaDefault = ahora.toLocaleDateString('es-CR');
         const horaDefault = ahora.toLocaleTimeString('es-CR', {
