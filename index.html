@@ -406,13 +406,20 @@
 
     function obtenerNombreUsuario(username) {
         if (!username) return "Sin asignar";
-        const key = username.trim().toLowerCase();
+    
+        // normalizar
+        const keyFull = username.trim().toLowerCase();
+        const key = keyFull.split('@')[0]; // quitar dominio si es correo
+    
+        // buscar coincidencia exacta
         for (const [u, nombre] of Object.entries(mapeoUsuarios)) {
-            if (key === u.toLowerCase() || key.includes(u.toLowerCase())) {
+            if (key === u.toLowerCase()) {
                 return nombre;
             }
         }
-        return username;
+    
+        // si no encuentra, mejor mostrar "Sin asignar"
+        return "Sin asignar";
     }
 
     // ==== CREAR ETIQUETA ====
