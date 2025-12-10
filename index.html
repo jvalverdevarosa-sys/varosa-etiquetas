@@ -314,13 +314,44 @@
     </div>
     
     <script>
-        // Datos de demostración
+        // ============================================
+        // MAPEO DE USUARIOS VAROSA
+        // Si agregan un nuevo bodeguero, añadirlo aquí
+        // ============================================
+        const mapeoUsuarios = {
+            "auxiliarbodegavarosa": "Anthony Nuñez",
+            "auxiliarbodegavarosa1": "Andrés Otéro",
+            "auxiliarbodegavarosa2": "Orlando Contreras",
+            "auxiliarbodegavarosa3": "Michael Arce",
+            "luisrodrguezjimnez1": "Luis Rodríguez Jiménez"
+        };
+        
+        // Función para obtener nombre real del usuario
+        function obtenerNombreUsuario(username) {
+            if (!username) return "Sin asignar";
+            
+            // Limpiar el username (quitar espacios, lowercase)
+            const usernameLimpio = username.trim().toLowerCase();
+            
+            // Buscar en el mapeo
+            for (const [key, nombre] of Object.entries(mapeoUsuarios)) {
+                if (usernameLimpio === key.toLowerCase() || 
+                    usernameLimpio.includes(key.toLowerCase())) {
+                    return nombre;
+                }
+            }
+            
+            // Si no está en el mapeo, devolver el original
+            return username;
+        }
+        
+        // Datos de demostración (usando username para probar mapeo)
         const datosDemo = {
             ov: "SO-08194",
             cliente: "NAYARA HOTELS SRL",
             ruta: "FORTUNA - CASTILLO",
             totalBultos: 2,
-            alistador: "María González",  // Este dato vendría de Added User
+            alistador: obtenerNombreUsuario("auxiliarbodegavarosa1"),  // Probando mapeo
             notas: "",
             fecha: new Date().toLocaleString('es-CR', {
                 day: '2-digit',
@@ -430,12 +461,16 @@
             const params = new URLSearchParams(window.location.search);
             
             if (params.has('ov')) {
+                // Obtener el alistador y convertirlo a nombre real
+                const alistadorRaw = params.get('alistador') || params.get('user') || '';
+                const alistadorNombre = obtenerNombreUsuario(alistadorRaw);
+                
                 const datos = {
                     ov: params.get('ov') || '',
                     cliente: params.get('cliente') || '',
                     ruta: params.get('ruta') || '',
                     totalBultos: parseInt(params.get('bultos')) || 1,
-                    alistador: params.get('alistador') || params.get('user') || 'Sin asignar',
+                    alistador: alistadorNombre,
                     notas: params.get('notas') || '',
                     fecha: params.get('fecha') || new Date().toLocaleString('es-CR', {
                         day: '2-digit',
