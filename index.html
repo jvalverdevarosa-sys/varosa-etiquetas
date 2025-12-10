@@ -3,317 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etiquetas VAROSA</title>
+    <title>Etiqueta VAROSA v3</title>
+
     <style>
-        /* ============================================
-           RESET Y CONFIGURACIÓN BASE
-           ============================================ */
+        /* =========================================
+           VARIABLES GLOBALES (TAMAÑO DE ETIQUETA)
+           ========================================= */
+        :root {
+            --label-width: 101.6mm;   /* 4" */
+            --label-height: 50.8mm;   /* 2" */
+        }
+
+        /* =========================================
+           CONFIGURACIÓN DE PÁGINA PARA IMPRESIÓN
+           ========================================= */
+        @page {
+            size: var(--label-width) var(--label-height);
+            margin: 0;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
-        
-        body {
+
+        html, body {
+            width: 100%;
+            height: 100%;
             font-family: Arial, Helvetica, sans-serif;
-            background: #e5e7eb;
-            min-height: 100vh;
-            padding: 20px;
         }
-        
-        /* ============================================
-           CONTROLES (solo pantalla)
-           ============================================ */
-        .controles {
-            max-width: 500px;
-            margin: 0 auto 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+        /* ======================
+           VISTA EN PANTALLA
+           ====================== */
+        @media screen {
+            body {
+                background: #e5e7eb;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 20px;
+            }
+
+            .controles {
+                background: #ffffff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+                margin-bottom: 20px;
+                width: 100%;
+                max-width: 500px;
+            }
+
+            .controles h2 {
+                margin-bottom: 10px;
+                color: #111827;
+                font-size: 18px;
+            }
+
+            .controles p {
+                margin-bottom: 10px;
+                color: #6b7280;
+                font-size: 13px;
+            }
+
+            .controles button {
+                background: #2563eb;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 13px;
+                margin-right: 8px;
+            }
+
+            .controles button.secondary {
+                background: #6b7280;
+            }
+
+            .controles button:hover {
+                opacity: 0.9;
+            }
+
+            .etiquetas-container {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+
+            /* Para que en pantalla se vea un poco más grande */
+            .etiqueta-wrapper {
+                transform: scale(1.1);
+                transform-origin: top left;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                background: white;
+            }
+
+            .etiqueta-label {
+                background: #fef3c7;
+                padding: 4px 10px;
+                font-size: 11px;
+                font-weight: bold;
+                color: #92400e;
+                border-radius: 5px 5px 0 0;
+            }
         }
-        
-        .controles h2 {
-            margin-bottom: 10px;
-            color: #1f2937;
-            font-size: 18px;
+
+        /* ======================
+           VISTA PARA IMPRESIÓN
+           ====================== */
+        @media print {
+
+            body {
+                background: #ffffff !important;
+            }
+
+            .controles,
+            .etiqueta-label {
+                display: none !important;
+            }
+
+            .etiquetas-container {
+                display: block;
+            }
+
+            .etiqueta-wrapper {
+                width: var(--label-width);
+                height: var(--label-height);
+                box-shadow: none !important;
+                page-break-after: always;
+            }
+
+            .etiqueta-wrapper:last-child {
+                page-break-after: avoid;
+            }
         }
-        
-        .controles p {
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 15px;
-        }
-        
-        .controles button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-        }
-        
-        .controles button:hover {
-            background: #1d4ed8;
-        }
-        
-        .config-box {
-            margin-top: 15px;
-            padding: 12px;
-            background: #fef3c7;
-            border-radius: 6px;
-            font-size: 12px;
-            border-left: 4px solid #f59e0b;
-        }
-        
-        /* ============================================
-           CONTENEDOR DE ETIQUETAS
-           ============================================ */
-        .etiquetas-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .etiqueta-box {
-            background: #f9fafb;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        
-        .etiqueta-titulo {
-            text-align: center;
-            font-size: 12px;
-            color: #92400e;
-            background: #fef3c7;
-            padding: 5px 15px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        
-        /* ============================================
-           LA ETIQUETA - 101.6mm x 50.8mm
-           ============================================ */
+
+        /* ======================
+           DISEÑO DE LA ETIQUETA
+           ====================== */
+
         .etiqueta {
-            width: 101.6mm;
-            height: 50.8mm;
-            background: white;
-            border: 1px solid #ccc;
+            width: var(--label-width);
+            height: var(--label-height);
+            background: #ffffff;
+            display: grid;
+            grid-template-columns: 1fr 25mm;
+            grid-template-rows: auto 1fr auto;
             padding: 2.5mm;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden;
         }
-        
-        /* HEADER: OV + RUTA */
-        .etiqueta-header {
+
+        /* HEADER */
+        .header {
+            grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 0.5mm solid #000;
+            border-bottom: 0.6mm solid #000;
             padding-bottom: 1.5mm;
             margin-bottom: 1.5mm;
+            gap: 3mm;
         }
-        
+
         .ov-numero {
-            font-size: 5mm;
+            font-size: 5.2mm;
             font-weight: bold;
+            letter-spacing: 0.2mm;
+            white-space: nowrap;
         }
-        
+
         .ruta {
-            font-size: 3mm;
+            font-size: 3.1mm;
             font-weight: bold;
-            border: 0.4mm solid #000;
+            background: #ffffff;
+            color: #000;
             padding: 1mm 2mm;
+            border: 0.4mm solid #000;
             border-radius: 1mm;
-            max-width: 42mm;
-            text-align: center;
+            text-align: right;
+            max-width: 45mm;
+            line-height: 1.2;
             word-wrap: break-word;
         }
-        
-        /* CUERPO: INFO + QR */
-        .etiqueta-body {
-            display: flex;
-            flex: 1;
-            gap: 2mm;
-        }
-        
-        /* Lado izquierdo: Cliente, bulto, alistador, notas */
-        .info-lado {
-            flex: 1;
+
+        /* CONTENIDO PRINCIPAL */
+        .contenido {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-width: 0;
+            padding-right: 2mm;
+            overflow: hidden;
         }
-        
+
         .cliente {
             font-size: 3.5mm;
             font-weight: bold;
-            line-height: 1.3;
+            line-height: 1.25;
+            max-height: 11mm;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
         }
-        
-        .info-medio {
+
+        .info-row {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 3mm;
-            margin: 1mm 0;
+            gap: 2mm;
+            margin-top: 1mm;
         }
-        
+
         .bulto {
-            font-size: 3.5mm;
+            font-size: 4mm;
             font-weight: bold;
             background: #f3f4f6;
             padding: 1mm 2mm;
             border-radius: 1mm;
             border: 0.3mm solid #d1d5db;
-            white-space: nowrap;
         }
-        
+
         .alistador {
             font-size: 3mm;
-            color: #374151;
+            text-align: right;
+            flex-shrink: 1;
+            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
+
         .notas {
-            font-size: 2.8mm;
+            font-size: 3mm;
             font-weight: bold;
             color: #dc2626;
             background: #fef2f2;
             padding: 1mm 2mm;
             border-radius: 1mm;
             border: 0.3mm solid #fecaca;
+            margin-top: 1mm;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
-        .notas.hidden {
+
+        .notas:empty {
             display: none;
         }
-        
-        /* Lado derecho: QR */
-        .qr-lado {
-            width: 24mm;
+
+        /* QR */
+        .qr-section {
+            grid-row: 2 / 4;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-left: 0.3mm dashed #ccc;
             padding-left: 2mm;
+            border-left: 0.3mm dashed #9ca3af;
         }
-        
+
         .qr-code {
             width: 22mm;
             height: 22mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        .qr-code img, .qr-code canvas {
-            width: 100% !important;
-            height: 100% !important;
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
         }
-        
-        /* FOOTER: Fecha + Logo */
-        .etiqueta-footer {
+
+        /* FOOTER */
+        .footer {
+            grid-column: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 0.3mm solid #e5e7eb;
-            padding-top: 1mm;
-            margin-top: 1mm;
             font-size: 2.5mm;
-            color: #6b7280;
+            padding-top: 1mm;
+            border-top: 0.3mm solid #e5e7eb;
+            margin-top: auto;
         }
-        
+
         .logo-varosa {
             font-weight: bold;
-            color: #1f2937;
             font-size: 3mm;
         }
-        
-        /* ============================================
-           ESTILOS DE IMPRESIÓN
-           ============================================ */
-        @page {
-            size: 101.6mm 50.8mm;
-            margin: 0;
-        }
-        
-        @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            
-            body {
-                background: white;
-                padding: 0;
-                margin: 0;
-            }
-            
-            .controles, .etiqueta-titulo {
-                display: none !important;
-            }
-            
-            .etiquetas-wrapper {
-                gap: 0;
-            }
-            
-            .etiqueta-box {
-                background: transparent;
-                padding: 0;
-                margin: 0;
-            }
-            
-            .etiqueta {
-                border: none;
-                page-break-after: always;
-            }
-            
-            .etiqueta:last-child {
-                page-break-after: avoid;
-            }
-        }
     </style>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-    
+
     <!-- CONTROLES -->
     <div class="controles">
         <h2>🏷️ Etiquetas VAROSA</h2>
-        <p id="infoEtiquetas">Cargando datos...</p>
-        <div>
-            <button onclick="window.print()">🖨️ Imprimir</button>
-        </div>
-        <div class="config-box">
-            <strong>⚙️ Configuración al imprimir:</strong><br>
-            • Tamaño: User defined (101.6 × 50.8 mm)<br>
-            • Márgenes: Ninguno<br>
-            • Escala: 100%
+        <p>Se generará una etiqueta por cada bulto.</p>
+
+        <button id="btnImprimir" onclick="window.print()">🖨️ Imprimir todas</button>
+        <button class="secondary" onclick="cargarDatosDemo()">📋 Cargar demo</button>
+
+        <div style="margin-top: 12px; padding: 8px; background:#f0fdf4; border-radius:6px; font-size:12px;">
+            <strong>Chrome:</strong> Tamaño papel = 101.6 x 50.8 mm (personalizado) · Márgenes = Ninguno · Escala = 100%
         </div>
     </div>
-    
-    <!-- ETIQUETAS -->
-    <div class="etiquetas-wrapper" id="etiquetasContainer">
-        <!-- Se generan dinámicamente -->
-    </div>
-    
+
+    <!-- CONTENEDOR DE ETIQUETAS -->
+    <div id="etiquetasContainer" class="etiquetas-container"></div>
+
     <script>
-        // ============================================
+        // ===========================
         // MAPEO DE USUARIOS VAROSA
-        // ============================================
+        // ===========================
         const mapeoUsuarios = {
             "auxiliarbodegavarosa": "Anthony Nuñez",
             "auxiliarbodegavarosa1": "Andrés Otéro",
@@ -321,122 +331,168 @@
             "auxiliarbodegavarosa3": "Michael Arce",
             "luisrodrguezjimnez1": "Luis Rodríguez Jiménez"
         };
-        
+
         function obtenerNombreUsuario(username) {
             if (!username) return "Sin asignar";
-            const key = username.trim().toLowerCase();
-            for (const [u, nombre] of Object.entries(mapeoUsuarios)) {
-                if (key === u.toLowerCase()) return nombre;
+            const usernameLimpio = username.trim().toLowerCase();
+
+            for (const [key, nombre] of Object.entries(mapeoUsuarios)) {
+                if (
+                    usernameLimpio === key.toLowerCase() ||
+                    usernameLimpio.includes(key.toLowerCase())
+                ) {
+                    return nombre;
+                }
             }
             return username;
         }
-        
-        // ============================================
-        // GENERAR ETIQUETAS
-        // ============================================
-        function crearEtiqueta(datos, bultoActual) {
-            const notasClass = datos.notas ? '' : 'hidden';
-            const notasTexto = datos.notas ? `⚠️ ${datos.notas}` : '';
-            
-            const html = `
-                <div class="etiqueta-box">
-                    <div class="etiqueta-titulo">📦 Etiqueta ${bultoActual} de ${datos.totalBultos}</div>
-                    <div class="etiqueta">
-                        <div class="etiqueta-header">
-                            <span class="ov-numero">${datos.ov}</span>
-                            <span class="ruta">${datos.ruta}</span>
+
+        // DEMO
+        const datosDemo = {
+            ov: "SO-08194",
+            cliente: "NAYARA HOTELS SRL",
+            ruta: "FORTUNA - CASTILLO",
+            totalBultos: 3,
+            alistador: obtenerNombreUsuario("auxiliarbodegavarosa1"),
+            notas: "",
+            fecha: new Date().toLocaleString("es-CR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+        };
+
+        // Generar QR como base64
+        function generarQRBase64(datos, callback) {
+            const tempDiv = document.createElement("div");
+            tempDiv.style.position = "absolute";
+            tempDiv.style.left = "-9999px";
+            document.body.appendChild(tempDiv);
+
+            const qrData = JSON.stringify({
+                ov: datos.ov,
+                bulto: datos.bultoActual + "/" + datos.totalBultos,
+                ruta: datos.ruta
+            });
+
+            new QRCode(tempDiv, {
+                text: qrData,
+                width: 100,
+                height: 100,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            // Esperar a que se genere la imagen
+            setTimeout(() => {
+                const img = tempDiv.querySelector("img");
+                if (img) {
+                    callback(img.src);
+                }
+                document.body.removeChild(tempDiv);
+            }, 100);
+        }
+
+        // Plantilla HTML de la etiqueta
+        function crearEtiquetaHTML(datos, bultoActual, qrSrc) {
+            const notasHTML = datos.notas
+                ? `<div class="notas">⚠️ ${datos.notas}</div>`
+                : "";
+
+            return `
+                <div class="etiqueta-label">Etiqueta ${bultoActual} de ${datos.totalBultos}</div>
+                <div class="etiqueta">
+                    <div class="header">
+                        <span class="ov-numero">${datos.ov}</span>
+                        <span class="ruta">${datos.ruta}</span>
+                    </div>
+
+                    <div class="contenido">
+                        <div class="cliente">${datos.cliente}</div>
+
+                        <div class="info-row">
+                            <span class="bulto">📦 ${bultoActual} de ${datos.totalBultos}</span>
+                            <span class="alistador">👤 ${datos.alistador}</span>
                         </div>
-                        <div class="etiqueta-body">
-                            <div class="info-lado">
-                                <div class="cliente">${datos.cliente}</div>
-                                <div class="info-medio">
-                                    <span class="bulto">📦 ${bultoActual} de ${datos.totalBultos}</span>
-                                    <span class="alistador">👤 ${datos.alistador}</span>
-                                </div>
-                                <div class="notas ${notasClass}">${notasTexto}</div>
-                            </div>
-                            <div class="qr-lado">
-                                <div class="qr-code" id="qr-${bultoActual}"></div>
-                            </div>
+
+                        ${notasHTML}
+                    </div>
+
+                    <div class="qr-section">
+                        <div class="qr-code">
+                            <img src="${qrSrc}" alt="QR">
                         </div>
-                        <div class="etiqueta-footer">
-                            <span>${datos.fecha}</span>
-                            <span class="logo-varosa">VAROSA</span>
-                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <span class="fecha">${datos.fecha}</span>
+                        <span class="logo-varosa">VAROSA</span>
                     </div>
                 </div>
             `;
-            return html;
         }
-        
-        function generarQR(elementId, datos, bultoActual) {
-            const qrData = JSON.stringify({
-                ov: datos.ov,
-                b: `${bultoActual}/${datos.totalBultos}`,
-                r: datos.ruta.substring(0, 20)
-            });
-            
-            const element = document.getElementById(elementId);
-            if (element) {
-                new QRCode(element, {
-                    text: qrData,
-                    width: 85,
-                    height: 85,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.M
+
+        function generarEtiquetas(datos) {
+            const container = document.getElementById("etiquetasContainer");
+            container.innerHTML = "";
+
+            let generadas = 0;
+            const total = datos.totalBultos;
+
+            for (let i = 1; i <= total; i++) {
+                const datosConBulto = { ...datos, bultoActual: i };
+
+                generarQRBase64(datosConBulto, (qrSrc) => {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "etiqueta-wrapper";
+                    wrapper.innerHTML = crearEtiquetaHTML(datosConBulto, i, qrSrc);
+                    container.appendChild(wrapper);
+
+                    generadas++;
                 });
             }
         }
-        
-        function generarTodasEtiquetas(datos) {
-            const container = document.getElementById('etiquetasContainer');
-            container.innerHTML = '';
-            
-            // Crear todas las etiquetas
-            for (let i = 1; i <= datos.totalBultos; i++) {
-                container.innerHTML += crearEtiqueta(datos, i);
-            }
-            
-            // Generar QRs después de que el DOM esté listo
-            setTimeout(() => {
-                for (let i = 1; i <= datos.totalBultos; i++) {
-                    generarQR(`qr-${i}`, datos, i);
-                }
-            }, 100);
-            
-            // Actualizar info
-            document.getElementById('infoEtiquetas').textContent = 
-                `${datos.totalBultos} etiqueta(s) para: ${datos.cliente}`;
+
+        // Cargar demo
+        function cargarDatosDemo() {
+            generarEtiquetas(datosDemo);
         }
-        
-        // ============================================
-        // CARGAR DATOS
-        // ============================================
-        function cargarDatos() {
+
+        // Cargar datos desde URL (para integrarlo con tu sistema)
+        function cargarDatosDesdeURL() {
             const params = new URLSearchParams(window.location.search);
-            
-            const datos = {
-                ov: params.get('ov') || 'SO-00000',
-                cliente: params.get('cliente') || 'CLIENTE DE PRUEBA',
-                ruta: params.get('ruta') || 'RUTA DEMO',
-                totalBultos: parseInt(params.get('bultos')) || 1,
-                alistador: obtenerNombreUsuario(params.get('alistador') || params.get('user') || ''),
-                notas: params.get('notas') || '',
-                fecha: new Date().toLocaleString('es-CR', {
-                    day: '2-digit',
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })
-            };
-            
-            generarTodasEtiquetas(datos);
+
+            if (params.has("ov")) {
+                const alistadorRaw = params.get("alistador") || params.get("user") || "";
+                const alistadorNombre = obtenerNombreUsuario(alistadorRaw);
+
+                const datos = {
+                    ov: params.get("ov") || "",
+                    cliente: params.get("cliente") || "",
+                    ruta: params.get("ruta") || "",
+                    totalBultos: parseInt(params.get("bultos")) || 1,
+                    alistador: alistadorNombre,
+                    notas: params.get("notas") || "",
+                    fecha:
+                        params.get("fecha") ||
+                        new Date().toLocaleString("es-CR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        })
+                };
+                generarEtiquetas(datos);
+            } else {
+                generarEtiquetas(datosDemo);
+            }
         }
-        
-        // Iniciar
-        document.addEventListener('DOMContentLoaded', cargarDatos);
+
+        document.addEventListener("DOMContentLoaded", cargarDatosDesdeURL);
     </script>
 </body>
 </html>
