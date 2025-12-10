@@ -7,13 +7,18 @@
 
 <style>
     :root{
-        /* Colores corporativos VAROSA (solo para UI web) */
+        /* Colores corporativos VAROSA */
         --varosa-azul-oscuro: #1a365d;
+        --varosa-azul: #2563eb;
         --varosa-cyan: #0891b2;
-        
+        --varosa-cyan-light: #22d3ee;
+        --varosa-gris: #64748b;
+        --varosa-gris-light: #f1f5f9;
+
         --label-width: 101.6mm;
         --label-height: 50.8mm;
         --padding: 2mm;
+        --label-top-safe: 3mm; /* margen extra superior dentro de la etiqueta */
     }
 
     @page{
@@ -35,7 +40,7 @@
         font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
     }
 
-    /* ======== SOLO PANTALLA (UI con colores) ======== */
+    /* ======== SOLO PANTALLA ======== */
     @media screen{
         body{
             background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%);
@@ -70,7 +75,7 @@
         }
         .controles h2{
             font-size: 16px;
-            color: #64748b;
+            color: var(--varosa-gris);
             font-weight: normal;
         }
         .controles p{
@@ -78,7 +83,7 @@
             color: #64748b;
             margin-bottom: 16px;
             padding: 10px 12px;
-            background: #f1f5f9;
+            background: var(--varosa-gris-light);
             border-radius: 8px;
         }
         .controles button{
@@ -151,23 +156,24 @@
         }
     }
 
-    /* ======== DISEÑO DE LA ETIQUETA (Blanco y Negro) ======== */
+    /* ======== DISEÑO DE LA ETIQUETA ======== */
     .etiqueta{
         width: var(--label-width);
         height: var(--label-height);
         padding: var(--padding);
+        padding-top: calc(var(--padding) + var(--label-top-safe)); /* baja todo el contenido */
         display: flex;
         flex-direction: column;
         background: #fff;
     }
 
-    /* Header */
+    /* Header con banda de color */
     .header{
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         padding-bottom: 1.5mm;
-        border-bottom: 0.5mm solid #000;
+        border-bottom: 0.6mm solid var(--varosa-azul-oscuro);
         margin-bottom: 1.5mm;
     }
 
@@ -178,21 +184,22 @@
 
     .empresa{
         font-size: 5mm;
-        font-weight: bold;
-        color: #000;
+        font-weight: 800;
+        color: var(--varosa-azul-oscuro);
         letter-spacing: 0.5mm;
     }
 
     .documento{
         font-size: 3.8mm;
-        font-weight: bold;
-        color: #000;
+        font-weight: 800;
+        color: var(--varosa-cyan);
     }
 
     .fecha-hora{
-        font-size: 2.3mm;
-        color: #444;
+        font-size: 2.4mm;
+        color: #111827;
         margin-top: 0.3mm;
+        font-weight: 600;
     }
 
     .header-right{
@@ -205,7 +212,7 @@
     }
 
     .bulto-item{
-        border: 0.4mm solid #000;
+        border: 0.4mm solid var(--varosa-azul-oscuro);
         padding: 0.8mm 2mm;
         text-align: center;
         min-width: 11mm;
@@ -214,20 +221,31 @@
 
     .bulto-item:first-child{
         border-right: none;
+        border-radius: 1mm 0 0 1mm;
+    }
+
+    .bulto-item:last-child{
+        border-radius: 0 1mm 1mm 0;
+        background: var(--varosa-azul-oscuro);
+    }
+
+    .bulto-item:last-child small,
+    .bulto-item:last-child .numero{
+        color: #fff;
     }
 
     .bulto-item small{
         display: block;
         font-size: 1.8mm;
-        color: #000;
+        color: var(--varosa-gris);
         font-weight: 600;
     }
 
     .bulto-item .numero{
         font-size: 5mm;
-        font-weight: bold;
+        font-weight: 800;
         line-height: 1;
-        color: #000;
+        color: var(--varosa-azul-oscuro);
     }
 
     /* Cuerpo: INFO + QR */
@@ -251,16 +269,16 @@
     }
 
     .campo-label{
-        font-size: 2.2mm;
-        color: #666;
+        font-size: 2.4mm;
+        color: #111827;
         text-transform: uppercase;
-        letter-spacing: 0.3mm;
-        font-weight: 600;
+        letter-spacing: 0.2mm;
+        font-weight: 700;
     }
 
     .campo-valor{
-        font-size: 3.2mm;
-        font-weight: bold;
+        font-size: 3.4mm;
+        font-weight: 700;
         color: #000;
         line-height: 1.25;
         overflow: hidden;
@@ -270,23 +288,28 @@
     }
 
     .campo-valor.cliente{
-        font-size: 3.5mm;
+        font-size: 3.6mm;
+        font-weight: 700;
+        color: #000;
     }
 
     .campo-valor.ruta{
         font-size: 3mm;
-        border: 0.3mm solid #000;
+        background: var(--varosa-azul-oscuro);
+        color: #fff;
         padding: 1mm 2mm;
+        border-radius: 1mm;
         display: inline-block;
         font-weight: 600;
     }
 
     .notas{
         font-size: 2.6mm;
-        color: #000;
-        background: #fff;
+        color: #b91c1c;
+        background: #fef2f2;
         padding: 1.2mm 2mm;
-        border: 0.3mm solid #000;
+        border-radius: 1mm;
+        border-left: 0.6mm solid #ef4444;
         margin-top: 1mm;
         font-weight: 500;
     }
@@ -302,7 +325,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        border-left: 0.3mm dashed #999;
+        border-left: 0.3mm dashed #cbd5e1;
         padding-left: 2mm;
     }
 
@@ -319,35 +342,35 @@
 
     .qr-text{
         font-size: 1.8mm;
-        color: #666;
+        color: varosa-gris;
         margin-top: 0.8mm;
         text-align: center;
         text-transform: uppercase;
         letter-spacing: 0.2mm;
     }
 
-    /* Footer */
+    /* Footer: Alistador */
     .footer{
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-top: 0.3mm solid #ccc;
+        border-top: 0.3mm solid #e2e8f0;
         padding-top: 1mm;
         margin-top: auto;
         font-size: 2.4mm;
     }
 
     .alistador{
-        color: #444;
+        color: var(--varosa-gris);
     }
 
     .alistador strong{
-        color: #000;
+        color: var(--varosa-azul-oscuro);
     }
 
     .powered{
         font-size: 1.8mm;
-        color: #999;
+        color: #94a3b8;
     }
 </style>
 
@@ -395,13 +418,13 @@
     // ==== CREAR ETIQUETA ====
     function crearEtiqueta(datos, nroBulto) {
         const notasClass = datos.notas ? '' : 'hidden';
-        const notasHTML = datos.notas ? `⚠ ${datos.notas}` : '';
+        const notasHTML = datos.notas ? `⚠️ ${datos.notas}` : '';
 
         return `
         <div class="etiqueta-wrapper">
             <div class="etiqueta-label">📦 Etiqueta ${nroBulto} de ${datos.totalBultos} — ${datos.documento}</div>
             <div class="etiqueta">
-                
+
                 <div class="header">
                     <div class="header-left">
                         <div class="empresa">VAROSA</div>
@@ -466,7 +489,7 @@
                 text: qrData,
                 width: 80,
                 height: 80,
-                colorDark: "#000000",
+                colorDark: "#1a365d",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.M
             });
@@ -491,7 +514,7 @@
 
         // Actualizar info
         const bultoText = datos.totalBultos === 1 ? 'etiqueta' : 'etiquetas';
-        document.getElementById("infoPagina").innerHTML = 
+        document.getElementById("infoPagina").innerHTML =
             `📦 <strong>${datos.totalBultos}</strong> ${bultoText} para: <strong>${datos.cliente}</strong>`;
     }
 
@@ -517,9 +540,9 @@
         // Obtener fecha/hora actual si no viene en URL
         const ahora = new Date();
         const fechaDefault = ahora.toLocaleDateString('es-CR');
-        const horaDefault = ahora.toLocaleTimeString('es-CR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+        const horaDefault = ahora.toLocaleTimeString('es-CR', {
+            hour: '2-digit',
+            minute: '2-digit'
         });
 
         const total = parseInt(p.get("bultos") || "1", 10);
