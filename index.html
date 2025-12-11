@@ -7,19 +7,13 @@
 
 <style>
     :root{
-        /* Colores corporativos VAROSA */
-        --varosa-azul-oscuro: #1a365d;
-        --varosa-azul: #2563eb;
-        --varosa-cyan: #0891b2;
-        --varosa-gris: #64748b;
-        --varosa-gris-light: #f1f5f9;
-
         /* Tamaño de la etiqueta física */
         --label-width: 101.6mm;
         --label-height: 50.8mm;
 
         --padding: 2mm;
-        --label-top-safe: 5mm; /* espacio extra interno arriba */
+        /* bajamos este valor para que suba todo el contenido */
+        --label-top-safe: 2mm;
     }
 
     @page{
@@ -41,10 +35,10 @@
         font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
     }
 
-    /* ======== SOLO PANTALLA ======== */
+    /* ======== SOLO PANTALLA (puede seguir con colores) ======== */
     @media screen{
         body{
-            background: linear-gradient(135deg, #1a365d 0%, #0891b2 100%);
+            background: #0f172a;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -69,47 +63,35 @@
         .logo-text{
             font-size: 24px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--varosa-azul-oscuro) 0%, var(--varosa-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         .controles h2{
             font-size: 16px;
-            color: var(--varosa-gris);
-            font-weight: 600;
+            font-weight: 700;
         }
         .controles p{
             font-size: 13px;
-            color: #64748b;
             margin-bottom: 16px;
             padding: 10px 12px;
-            background: var(--varosa-gris-light);
+            background: #f1f5f9;
             border-radius: 8px;
         }
         .controles button{
-            background: linear-gradient(135deg, var(--varosa-azul-oscuro) 0%, var(--varosa-cyan) 100%);
+            background: #000;
             color: #fff;
             border: none;
             padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .controles button:hover{
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4);
+            font-weight: 700;
         }
         .config-box{
             font-size: 11px;
             margin-top: 16px;
-            background: #ecfeff;
+            background: #e5e7eb;
             padding: 10px 12px;
             border-radius: 8px;
-            border-left: 3px solid var(--varosa-cyan);
-            color: var(--varosa-azul-oscuro);
+            font-weight: 700;
         }
         .etiquetas-container{
             display: flex;
@@ -124,10 +106,10 @@
             overflow: hidden;
         }
         .etiqueta-label{
-            background: linear-gradient(135deg, var(--varosa-azul-oscuro) 0%, var(--varosa-cyan) 100%);
+            background: #000;
             padding: 6px 16px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             color: #fff;
             text-align: center;
         }
@@ -159,7 +141,7 @@
         }
     }
 
-    /* ======== DISEÑO DE LA ETIQUETA ======== */
+    /* ======== DISEÑO DE LA ETIQUETA (sólo blanco y negro) ======== */
     .etiqueta{
         width: var(--label-width);
         height: var(--label-height);
@@ -168,6 +150,8 @@
         display: flex;
         flex-direction: column;
         background: #fff;
+        color: #000;
+        font-weight: 700; /* todo el texto en negrita */
     }
 
     /* Header */
@@ -175,9 +159,9 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding-bottom: 1.2mm;
-        border-bottom: 0.6mm solid var(--varosa-azul-oscuro);
-        margin-bottom: 1.2mm;
+        padding-bottom: 0.8mm;   /* menos alto */
+        border-bottom: 0.4mm solid #000;
+        margin-bottom: 0.8mm;
     }
 
     .header-left{
@@ -188,14 +172,14 @@
     .empresa{
         font-size: 5mm;
         font-weight: 800;
-        color: var(--varosa-azul-oscuro);
+        color: #000;
         letter-spacing: 0.5mm;
     }
 
     .documento{
         font-size: 4mm;
         font-weight: 800;
-        color: var(--varosa-azul);
+        color: #000;
     }
 
     .fecha-hora{
@@ -215,7 +199,7 @@
     }
 
     .bulto-item{
-        border: 0.4mm solid var(--varosa-azul-oscuro);
+        border: 0.3mm solid #000;
         padding: 0.8mm 2mm;
         text-align: center;
         min-width: 11mm;
@@ -230,12 +214,7 @@
 
     .bulto-item:last-child{
         border-radius: 0 1mm 1mm 0;
-        background: var(--varosa-azul-oscuro);
-    }
-
-    .bulto-item:last-child small,
-    .bulto-item:last-child .numero{
-        color: #fff;
+        background: #fff; /* ya sin relleno oscuro */
     }
 
     .bulto-item small{
@@ -249,7 +228,7 @@
         font-size: 5mm;
         font-weight: 800;
         line-height: 1;
-        color: var(--varosa-azul-oscuro);
+        color: #000;
     }
 
     /* Cuerpo */
@@ -268,7 +247,7 @@
     }
 
     .campo{
-        margin-bottom: 0.8mm;
+        margin-bottom: 0.6mm; /* un poco menos para ganar espacio */
     }
 
     .campo-label{
@@ -276,12 +255,12 @@
         color: #000;
         text-transform: uppercase;
         letter-spacing: 0.3mm;
-        font-weight: 700 !important;
+        font-weight: 700;
     }
 
     .campo-valor{
         font-size: 3.2mm;
-        font-weight: 700 !important;
+        font-weight: 700;
         color: #000;
         line-height: 1.25;
         overflow: hidden;
@@ -292,28 +271,28 @@
 
     .campo-valor.cliente{
         font-size: 3.5mm;
-        font-weight: 800 !important;
+        font-weight: 800;
     }
 
     .campo-valor.ruta{
         font-size: 3mm;
         background: #fff;
         color: #000;
-        padding: 0.8mm 2mm;
+        padding: 0.6mm 2mm;
         border-radius: 1mm;
-        border: 0.5mm solid #000;
+        border: 0.3mm solid #000;
         display: inline-block;
-        font-weight: 800 !important;
+        font-weight: 800;
     }
 
     .notas{
         font-size: 2.7mm;
-        color: #b91c1c;
-        background: #fef2f2;
-        padding: 1.2mm 2mm;
-        border-radius: 1mm;
-        border-left: 0.6mm solid #ef4444;
-        margin-top: 1mm;
+        color: #000;
+        background: #fff;             /* sin fondo de color */
+        padding: 0.8mm 2mm;           /* un poco más compacta */
+        border-radius: 0;
+        border-left: 0.3mm solid #000;/* línea negra simple */
+        margin-top: 0.5mm;
         font-weight: 700;
     }
 
@@ -328,7 +307,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        border-left: 0.3mm dashed #cbd5e1;
+        border-left: 0.3mm dashed #000;
         padding-left: 2mm;
     }
 
@@ -358,25 +337,25 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-top: 0.3mm solid #e2e8f0;
-        padding-top: 1mm;
-        margin-top: auto;
+        border-top: 0.3mm solid #000;
+        padding-top: 0.6mm;
+        margin-top: 0.6mm;  /* subimos el footer */
         font-size: 2.5mm;
     }
 
     .alistador{
         color: #000;
-        font-weight: 700 !important;
+        font-weight: 700;
     }
 
     .alistador strong{
         color: #000;
-        font-weight: 800 !important;
+        font-weight: 800;
     }
 
     .powered{
         font-size: 2mm;
-        color: #94a3b8;
+        color: #000;
         font-weight: 700;
     }
 </style>
@@ -411,26 +390,25 @@
         "luisrodrguezjimnez1":   "Luis Rodríguez Jiménez"
     };
 
-        function obtenerNombreUsuario(username) {
-            if (!username) return "Sin asignar";
-        
-            // Normalizar: quitar dominio si viene un correo
-            const key = username.trim().toLowerCase().split('@')[0];
-        
-            // Buscar coincidencia exacta dentro del mapa
-            if (mapeoUsuarios[key]) {
-                return mapeoUsuarios[key];
-            }
-        
-            // Si ya viene un nombre completo (tiene espacio)
-            if (username.includes(" ")) {
-                return username;
-            }
-        
-            // Si no coincide nada, devolvemos esto:
-            return "Sin asignar";
+    function obtenerNombreUsuario(username) {
+        if (!username) return "Sin asignar";
+
+        // Normalizar: quitar dominio si viene un correo
+        const key = username.trim().toLowerCase().split('@')[0];
+
+        // Buscar coincidencia exacta dentro del mapa
+        if (mapeoUsuarios[key]) {
+            return mapeoUsuarios[key];
         }
 
+        // Si ya viene un nombre completo (tiene espacio)
+        if (username.includes(" ")) {
+            return username;
+        }
+
+        // Si no coincide nada, devolvemos esto:
+        return "Sin asignar";
+    }
 
     // ==== CREAR ETIQUETA ====
     function crearEtiqueta(datos, nroBulto) {
