@@ -7,12 +7,9 @@
 
 <style>
     :root{
-        /* Tamaño de la etiqueta física */
         --label-width: 101.6mm;
         --label-height: 50.8mm;
-
         --padding: 2mm;
-        /* bajamos este valor para que suba todo el contenido */
         --label-top-safe: 2mm;
     }
 
@@ -35,7 +32,6 @@
         font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
     }
 
-    /* ======== SOLO PANTALLA (puede seguir con colores) ======== */
     @media screen{
         body{
             background: #0f172a;
@@ -115,7 +111,6 @@
         }
     }
 
-    /* ======== SOLO IMPRESIÓN ======== */
     @media print{
         body{
             background: #fff !important;
@@ -141,7 +136,6 @@
         }
     }
 
-    /* ======== DISEÑO DE LA ETIQUETA (sólo blanco y negro) ======== */
     .etiqueta{
         width: var(--label-width);
         height: var(--label-height);
@@ -151,15 +145,14 @@
         flex-direction: column;
         background: #fff;
         color: #000;
-        font-weight: 700; /* todo el texto en negrita */
+        font-weight: 700;
     }
 
-    /* Header */
     .header{
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        padding-bottom: 0.8mm;   /* menos alto */
+        padding-bottom: 0.8mm;
         border-bottom: 0.4mm solid #000;
         margin-bottom: 0.8mm;
     }
@@ -214,7 +207,7 @@
 
     .bulto-item:last-child{
         border-radius: 0 1mm 1mm 0;
-        background: #fff; /* ya sin relleno oscuro */
+        background: #fff;
     }
 
     .bulto-item small{
@@ -231,7 +224,6 @@
         color: #000;
     }
 
-    /* Cuerpo */
     .body{
         display: flex;
         flex: 1;
@@ -247,7 +239,7 @@
     }
 
     .campo{
-        margin-bottom: 0.6mm; /* un poco menos para ganar espacio */
+        margin-bottom: 0.6mm;
     }
 
     .campo-label{
@@ -288,10 +280,10 @@
     .notas{
         font-size: 2.7mm;
         color: #000;
-        background: #fff;             /* sin fondo de color */
-        padding: 0.8mm 2mm;           /* un poco más compacta */
+        background: #fff;
+        padding: 0.8mm 2mm;
         border-radius: 0;
-        border-left: 0.3mm solid #000;/* línea negra simple */
+        border-left: 0.3mm solid #000;
         margin-top: 0.5mm;
         font-weight: 700;
     }
@@ -300,7 +292,6 @@
         display: none;
     }
 
-    /* QR */
     .qr-section{
         width: 24mm;
         display: flex;
@@ -332,14 +323,13 @@
         font-weight: 700;
     }
 
-    /* Footer */
     .footer{
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-top: 0.3mm solid #000;
         padding-top: 0.6mm;
-        margin-top: 0.6mm;  /* subimos el footer */
+        margin-top: 0.6mm;
         font-size: 2.5mm;
     }
 
@@ -392,21 +382,13 @@
 
     function obtenerNombreUsuario(username) {
         if (!username) return "Sin asignar";
-
-        // Normalizar: quitar dominio si viene un correo
         const key = username.trim().toLowerCase().split('@')[0];
-
-        // Buscar coincidencia exacta dentro del mapa
         if (mapeoUsuarios[key]) {
             return mapeoUsuarios[key];
         }
-
-        // Si ya viene un nombre completo (tiene espacio)
         if (username.includes(" ")) {
             return username;
         }
-
-        // Si no coincide nada, devolvemos esto:
         return "Sin asignar";
     }
 
@@ -469,14 +451,11 @@
         </div>`;
     }
 
-    // ==== GENERAR QR ====
+    // ==== GENERAR QR (formato compatible con factura) ====
     function generarQR(elementId, datos, nroBulto) {
-        const qrData = JSON.stringify({
-            ov: datos.documento,
-            b: `${nroBulto}/${datos.totalBultos}`,
-            c: datos.cliente.substring(0, 30),
-            r: datos.ruta.substring(0, 20)
-        });
+        // Formato compatible con QR de factura Books
+        // $OV:id $R:ruta $A:alistador $B:bulto/total
+        const qrData = `$OV:${datos.ovId} $R:${datos.ruta} $A:${datos.alistadorUsername} $B:${nroBulto}/${datos.totalBultos}`;
 
         const element = document.getElementById(elementId);
         if (element) {
@@ -525,7 +504,9 @@
                 cliente: "NAYARA HOTELS SRL",
                 notas: "",
                 alistador: obtenerNombreUsuario("auxiliarbodegavarosa1"),
-                totalBultos: 2
+                alistadorUsername: "auxiliarbodegavarosa1",
+                totalBultos: 2,
+                ovId: "4809466000000261034" // ID de Creator (demo)
             });
             return;
         }
@@ -548,7 +529,9 @@
             cliente: p.get("cliente") || "",
             notas: p.get("notas") || "",
             alistador: obtenerNombreUsuario(alistadorRaw),
-            totalBultos: isNaN(total) ? 1 : total
+            alistadorUsername: alistadorRaw, // Username original para el QR
+            totalBultos: isNaN(total) ? 1 : total,
+            ovId: p.get("ov_id") || "" // ID de Creator para trazabilidad
         };
 
         generarEtiquetas(datos);
