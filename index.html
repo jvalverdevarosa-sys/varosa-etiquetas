@@ -3,6 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <title>Etiquetas VAROSA</title>
+
+<script>
+/* ===== VAROSA - 18 set 2026 - corrige direcciones codificadas dos veces =====
+   El widget de Alisto manda los datos codificados una vez, pero Zoho vuelve a
+   codificar la direccion al abrir la pestana, y el nombre del cliente salia
+   impreso como JOHNNY%20ROMERO%20BARRIENTOS.
+   Este bloque arregla la direccion ANTES de que el resto de la pagina la lea.
+   Solo actua si el valor trae la huella de la doble codificacion (%25 mas dos
+   caracteres hexadecimales); si la direccion viene bien, no la toca.
+   No modifica nada del codigo que sigue. */
+(function(){
+  try{
+    var s = String(window.location.search || "");
+    if(s.length < 2 || s.indexOf("%25") === -1){ return; }
+    var cambio = false;
+    var nuevas = s.substring(1).split("&").map(function(par){
+      var i = par.indexOf("=");
+      if(i === -1){ return par; }
+      var clave = par.substring(0, i);
+      var crudo = par.substring(i + 1);
+      if(!/%25[0-9A-Fa-f]{2}/.test(crudo)){ return par; }
+      try{
+        var valor = decodeURIComponent(decodeURIComponent(crudo.replace(/\+/g, "%20")));
+        cambio = true;
+        return clave + "=" + encodeURIComponent(valor);
+      }catch(e){ return par; }
+    });
+    if(cambio && window.history && window.history.replaceState){
+      window.history.replaceState(null, "",
+        window.location.pathname + "?" + nuevas.join("&") + window.location.hash);
+    }
+  }catch(e){ /* si algo falla, la pagina sigue como antes */ }
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
@@ -451,11 +485,20 @@
         </div>`;
     }
 
+    // ==== QR: la libreria qrcodejs revienta con tildes y no dibuja nada
+    // (queda un cuadro negro). Solo para el TEXTO DEL QR se quitan las tildes;
+    // lo que se imprime en la etiqueta conserva sus tildes. ====
+    function soloASCII(texto) {
+        var t = String(texto == null ? "" : texto);
+        try { t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); } catch (e) {}
+        return t.replace(/[^\x20-\x7E]/g, "");
+    }
+
     // ==== GENERAR QR (formato compatible con factura) ====
     function generarQR(elementId, datos, nroBulto) {
         // Formato compatible con QR de factura Books
         // $OV:id $R:ruta $A:alistador $B:bulto/total
-        const qrData = `$OV:${datos.ovId} $R:${datos.ruta} $A:${datos.alistadorUsername} $B:${nroBulto}/${datos.totalBultos}`;
+        const qrData = `$OV:${soloASCII(datos.ovId)} $R:${soloASCII(datos.ruta)} $A:${soloASCII(datos.alistadorUsername)} $B:${nroBulto}/${datos.totalBultos}`;
 
         const element = document.getElementById(elementId);
         if (element) {
