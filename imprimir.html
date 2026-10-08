@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Etiquetas VAROSA · hoja carta</title>
 <!--
-  VAROSA · Etiquetas en hoja carta y texto libre · v1.0 · 08-Oct-2026
+  VAROSA · Etiquetas en hoja carta y texto libre · v1.1 · 08-Oct-2026 (Norteñas: registro grande + opción 4x2)
   La abre el widget "Etiquetas" de la app de Picking. Los datos llegan en
   ?d=<JSON en base64url> (solo letras, numeros, - y _), asi Zoho no los puede
   volver a codificar (problema medido el 18-sep con la pagina de alisto).
@@ -30,7 +30,8 @@
 
   /* ---- hoja carta ---- */
   .hoja{ width:215.9mm; height:279.4mm; background:#fff; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.15); }
-  .hoja.cuartos{ display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+  .hoja.cuartos{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:minmax(0,1fr) minmax(0,1fr); }
+  .cuarto{ min-width:0; overflow:hidden; }
   .media{ height:139.7mm; width:100%; padding:9mm 11mm; position:relative; display:flex; flex-direction:column; }
   .media + .media{ border-top:0.4mm dashed #888; }
   .cuarto{ padding:7mm 8mm; position:relative; display:flex; flex-direction:column; border:0.3mm dashed #aaa; }
@@ -62,20 +63,28 @@
   .fragil{ background:var(--tinta); color:#fff; font-size:9mm; font-weight:900; letter-spacing:1.5mm; display:flex; align-items:center; justify-content:center; padding:0 6mm; border-radius:2mm; }
   .notas{ margin-top:3mm; font-size:3.8mm; border-left:1.2mm solid var(--tinta); padding-left:3mm; }
 
-  /* ---- norteñas ---- */
+  /* ---- norteñas (v1.1: el REGISTRO es lo más grande de la etiqueta) ---- */
   .nt{ display:flex; flex-direction:column; height:100%; }
-  .nt-cab{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:0.5mm solid var(--tinta); padding-bottom:2mm; margin-bottom:3mm; }
-  .nt-prod{ font-size:6mm; font-weight:900; line-height:1.15; }
-  .cuarto .nt-prod{ font-size:4.4mm; }
-  .nt-reg{ margin:3mm 0; border:0.8mm solid var(--tinta); border-radius:2mm; padding:2.5mm 3mm; }
-  .nt-reg .v{ font-size:7mm; font-weight:900; letter-spacing:0.3mm; }
-  .cuarto .nt-reg .v{ font-size:5mm; }
+  .nt-cab{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:0.5mm solid var(--tinta); padding-bottom:2mm; margin-bottom:2.5mm; }
+  .nt-prod{ font-size:5mm; font-weight:900; line-height:1.15; }
+  .cuarto .nt-prod{ font-size:3.8mm; }
+  .nt-reg{ flex:1; margin:3mm 0; border:1.2mm solid var(--tinta); border-radius:3mm; padding:3mm; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .nt-reg .rot{ font-size:4mm; color:var(--tinta); }
+  .cuarto .nt-reg .rot{ font-size:3mm; }
+  .nt-reg .v{ font-weight:900; letter-spacing:0.3mm; line-height:1; white-space:nowrap; }
   .nt-reg .v.falta{ color:#b3261e; }
-  .nt-grid{ display:grid; grid-template-columns:1fr 1fr; gap:2mm 4mm; font-size:3.6mm; }
-  .cuarto .nt-grid{ font-size:3mm; }
+  .nt-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:2mm 4mm; font-size:3.6mm; }
+  .cuarto .nt-grid{ grid-template-columns:1fr 1fr; font-size:3mm; }
   .nt-grid b{ display:block; font-size:2.6mm; color:var(--gris); text-transform:uppercase; letter-spacing:0.3mm; }
-  .nt-pie{ margin-top:auto; font-size:3mm; color:var(--gris); border-top:0.3mm solid #bbb; padding-top:2mm; }
+  .nt-pie{ margin-top:2.5mm; font-size:3mm; color:var(--gris); border-top:0.3mm solid #bbb; padding-top:2mm; }
   .cuarto .nt-pie{ font-size:2.4mm; }
+  /* 4x2 de la impresora de etiquetas */
+  .nt4{ width:100%; height:100%; display:flex; flex-direction:column; }
+  .nt4 .p{ font-size:3.2mm; font-weight:900; line-height:1.1; max-height:7.2mm; overflow:hidden; }
+  .nt4 .rg{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0.7mm solid var(--tinta); border-radius:1.5mm; margin:1.2mm 0; }
+  .nt4 .rg small{ font-size:2.3mm; font-weight:700; letter-spacing:0.2mm; text-transform:uppercase; }
+  .nt4 .rg b{ font-weight:900; line-height:1; white-space:nowrap; }
+  .nt4 .pie{ font-size:2.3mm; display:flex; justify-content:space-between; gap:2mm; }
 
   /* ---- texto libre ---- */
   .libre{ font-weight:900; text-align:center; line-height:1.05; word-break:break-word; text-transform:uppercase; }
@@ -181,34 +190,63 @@
   }
 
   /* ================= NORTEÑAS ================= */
+  /* Tamaño del número de registro según su largo y el tamaño de etiqueta,
+     para que ocupe el ancho disponible sin salirse (Arial negrita ~0.55 em por caracter; se usa 0.6 de margen). */
+  function tamRegistro(texto, anchoMm, maxMm){
+    var n = Math.max(String(texto).length, 6);
+    return Math.min(maxMm, Math.floor((anchoMm / (n * 0.6)) * 10) / 10);
+  }
   function nortenas(D){
     var prods = Array.isArray(D.productos) ? D.productos : [];
-    var porHoja = (D.tamano === "cuarto") ? 4 : 2;
+    var tam = D.tamano || "media";
+    var porHoja = (tam === "cuarto") ? 4 : 2;
     var bloques = [], sinReg = 0;
     for(var i=0;i<prods.length;i++){
       var P = prods[i];
       var copias = entero(P.copias, 1, 100);
       if(!P.registro){ sinReg++; }
+      var regTxt = P.registro ? String(P.registro) : "SIN REGISTRO";
       for(var c=0;c<copias;c++){
-        var h = '<div class="nt"><div class="nt-cab"><div class="marca">VAROSA</div><div class="sub">' + esc(D.cliente || "") + '</div></div>' +
+        var h;
+        if(tam === "4x2"){
+          var fs4 = tamRegistro(regTxt, 90, 13);
+          h = '<div class="eti4x2"><div class="nt4">' +
+                '<div class="p">' + esc(P.producto) + '</div>' +
+                '<div class="rg"><small>Registro Ministerio de Salud</small>' +
+                  '<b style="font-size:' + fs4 + 'mm' + (P.registro ? '' : ';color:#b3261e') + '">' + esc(regTxt) + '</b></div>' +
+                '<div class="pie"><span>' + (P.lote ? 'Lote ' + esc(P.lote) : '') + (P.vence ? ' · Vence ' + esc(P.vence) : '') + '</span>' +
+                  '<span>Distribuye: VAROSA</span></div>' +
+              '</div></div>';
+        } else {
+          var fsR = (tam === "cuarto") ? tamRegistro(regTxt, 84, 13) : tamRegistro(regTxt, 180, 26);
+          h = '<div class="nt"><div class="nt-cab"><div class="marca">VAROSA</div><div class="sub">' + esc(D.cliente || "") + '</div></div>' +
                 '<div class="nt-prod">' + esc(P.producto) + '</div>' +
-                '<div class="nt-reg"><div class="rot">Registro Ministerio de Salud</div><div class="v' + (P.registro ? '' : ' falta') + '">' +
-                  (P.registro ? esc(P.registro) : 'SIN REGISTRO') + '</div></div>' +
+                '<div class="nt-reg"><div class="rot">Registro Ministerio de Salud</div>' +
+                  '<div class="v' + (P.registro ? '' : ' falta') + '" style="font-size:' + fsR + 'mm">' + esc(regTxt) + '</div></div>' +
                 '<div class="nt-grid">' +
                   (P.marca ? '<div><b>Marca</b>' + esc(P.marca) + '</div>' : '') +
-                  (P.sku ? '<div><b>Código</b>' + esc(P.sku) + '</div>' : '') +
                   (P.lote ? '<div><b>Lote</b>' + esc(P.lote) + '</div>' : '') +
                   (P.vence ? '<div><b>Vence</b>' + esc(P.vence) + '</div>' : '') +
+                  (P.sku ? '<div><b>Código</b>' + esc(P.sku) + '</div>' : '') +
                   (D.documento ? '<div><b>Documento</b>' + esc(D.documento) + '</div>' : '') +
                 '</div>' +
                 '<div class="nt-pie">Distribuye: Comercializadora VAROSA S.A. · ' + esc(D.fecha || fechaHoy()) + '</div></div>';
+        }
         bloques.push(h);
       }
     }
     if(bloques.length === 0){ return null; }
     document.getElementById("titulo").textContent = "Norteñas · registro sanitario";
+    var aviso = (sinReg > 0 ? ' <b style="color:#b3261e">' + sinReg + ' producto(s) sin registro.</b>' : '');
+    if(tam === "4x2"){
+      document.getElementById("tamPagina").textContent = "@page{ size: 101.6mm 50.8mm; margin:0; }";
+      document.getElementById("config").innerHTML = "<b>Impresora de etiquetas:</b> Tamaño = User defined (101.6 × 50.8 mm) · Márgenes = Ninguno · Escala = 100%";
+      document.getElementById("info").innerHTML = "🧪 <b>" + bloques.length + "</b> etiqueta" + (bloques.length===1?"":"s") +
+        " en la impresora de etiquetas (4×2\")." + aviso;
+      return bloques.join("");
+    }
     document.getElementById("info").innerHTML = "🧪 <b>" + bloques.length + "</b> etiqueta" + (bloques.length===1?"":"s") +
-      ", " + porHoja + " por hoja carta." + (sinReg > 0 ? ' <b style="color:#b3261e">' + sinReg + ' producto(s) sin registro.</b>' : '');
+      ", " + porHoja + " por hoja carta." + aviso;
     return enHojas(bloques, porHoja);
   }
 
