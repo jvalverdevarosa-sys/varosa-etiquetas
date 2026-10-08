@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etiquetas VAROSA · hoja carta</title>
+<!--
+  VAROSA · Etiquetas en hoja carta y texto libre · v1.0 · 08-Oct-2026
+  La abre el widget "Etiquetas" de la app de Picking. Los datos llegan en
+  ?d=<JSON en base64url> (solo letras, numeros, - y _), asi Zoho no los puede
+  volver a codificar (problema medido el 18-sep con la pagina de alisto).
+  Tipos:
+    encomienda -> 1 etiqueta por bulto, media carta (2 por hoja), linea de corte
+    nortenas   -> 1 etiqueta por producto (x copias), media carta o cuarto de hoja
+    libre      -> texto grande (FRAGIL, etc.): 4x2" (impresora de etiquetas),
+                  media carta o carta completa
+  No guarda nada y no llama a ningun servidor.
+-->
+<style>
+  :root{ --azul:#325895; --cian:#15c9e4; --tinta:#111; --gris:#555; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{ font-family: Arial, Helvetica, sans-serif; color:var(--tinta); background:#e9edf3; }
+  .controles{ max-width:820px; margin:16px auto; background:#fff; border-radius:12px; padding:16px 20px; border-top:6px solid var(--azul); }
+  .controles h1{ font-size:20px; color:var(--azul); margin-bottom:6px; }
+  .controles p{ font-size:14px; color:#333; margin:4px 0; line-height:1.4; }
+  .controles button{ margin-top:10px; font-size:16px; font-weight:700; padding:10px 18px; border:0; border-radius:8px; background:var(--azul); color:#fff; cursor:pointer; }
+  .controles .config{ margin-top:10px; padding:8px 12px; background:#fff6e5; border-radius:8px; font-size:13px; }
+  .error{ max-width:820px; margin:16px auto; padding:16px; background:#fdecea; color:#8a1c14; border-radius:10px; font-size:15px; }
+  #hojas{ display:flex; flex-direction:column; align-items:center; gap:16px; padding-bottom:30px; }
+
+  /* ---- hoja carta ---- */
+  .hoja{ width:215.9mm; height:279.4mm; background:#fff; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+  .hoja.cuartos{ display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+  .media{ height:139.7mm; width:100%; padding:9mm 11mm; position:relative; display:flex; flex-direction:column; }
+  .media + .media{ border-top:0.4mm dashed #888; }
+  .cuarto{ padding:7mm 8mm; position:relative; display:flex; flex-direction:column; border:0.3mm dashed #aaa; }
+  .completa{ height:279.4mm; width:100%; padding:15mm; display:flex; align-items:center; justify-content:center; }
+  .vacia{ visibility:hidden; }
+
+  /* ---- 4x2 de la impresora de etiquetas ---- */
+  .eti4x2{ width:101.6mm; height:50.8mm; background:#fff; display:flex; align-items:center; justify-content:center; padding:2mm; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+
+  /* ---- encomienda ---- */
+  .enc-cab{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:0.6mm solid var(--tinta); padding-bottom:3mm; margin-bottom:4mm; }
+  .marca{ font-size:7mm; font-weight:900; letter-spacing:0.5mm; color:var(--azul); }
+  .sub{ font-size:3mm; color:var(--gris); margin-top:0.5mm; }
+  .bulto{ text-align:center; border:0.6mm solid var(--tinta); border-radius:2mm; padding:1.5mm 4mm; }
+  .bulto small{ display:block; font-size:2.6mm; font-weight:700; }
+  .bulto b{ font-size:8mm; line-height:1; }
+  .enc-cuerpo{ display:grid; grid-template-columns:1fr 1.6fr; gap:5mm; flex:1; }
+  .bloque{ border:0.4mm solid #999; border-radius:2mm; padding:3mm; }
+  .bloque.dest{ border:0.8mm solid var(--tinta); }
+  .rot{ font-size:2.8mm; font-weight:700; letter-spacing:0.4mm; text-transform:uppercase; color:var(--gris); margin-bottom:1.5mm; }
+  .nom{ font-size:5mm; font-weight:900; line-height:1.15; }
+  .bloque.dest .nom{ font-size:7mm; }
+  .lin{ font-size:3.8mm; line-height:1.35; margin-top:1mm; }
+  .bloque.dest .lin{ font-size:4.6mm; }
+  .tel{ font-weight:700; }
+  .enc-pie{ display:flex; gap:4mm; margin-top:4mm; align-items:stretch; }
+  .dato{ border:0.4mm solid #999; border-radius:2mm; padding:2mm 3mm; flex:1; }
+  .dato .v{ font-size:4.2mm; font-weight:700; }
+  .fragil{ background:var(--tinta); color:#fff; font-size:9mm; font-weight:900; letter-spacing:1.5mm; display:flex; align-items:center; justify-content:center; padding:0 6mm; border-radius:2mm; }
+  .notas{ margin-top:3mm; font-size:3.8mm; border-left:1.2mm solid var(--tinta); padding-left:3mm; }
+
+  /* ---- norteñas ---- */
+  .nt{ display:flex; flex-direction:column; height:100%; }
+  .nt-cab{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:0.5mm solid var(--tinta); padding-bottom:2mm; margin-bottom:3mm; }
+  .nt-prod{ font-size:6mm; font-weight:900; line-height:1.15; }
+  .cuarto .nt-prod{ font-size:4.4mm; }
+  .nt-reg{ margin:3mm 0; border:0.8mm solid var(--tinta); border-radius:2mm; padding:2.5mm 3mm; }
+  .nt-reg .v{ font-size:7mm; font-weight:900; letter-spacing:0.3mm; }
+  .cuarto .nt-reg .v{ font-size:5mm; }
+  .nt-reg .v.falta{ color:#b3261e; }
+  .nt-grid{ display:grid; grid-template-columns:1fr 1fr; gap:2mm 4mm; font-size:3.6mm; }
+  .cuarto .nt-grid{ font-size:3mm; }
+  .nt-grid b{ display:block; font-size:2.6mm; color:var(--gris); text-transform:uppercase; letter-spacing:0.3mm; }
+  .nt-pie{ margin-top:auto; font-size:3mm; color:var(--gris); border-top:0.3mm solid #bbb; padding-top:2mm; }
+  .cuarto .nt-pie{ font-size:2.4mm; }
+
+  /* ---- texto libre ---- */
+  .libre{ font-weight:900; text-align:center; line-height:1.05; word-break:break-word; text-transform:uppercase; }
+
+  @media print{
+    body{ background:#fff; }
+    .controles, .error{ display:none !important; }
+    #hojas{ gap:0; padding:0; display:block; }
+    .hoja, .eti4x2{ box-shadow:none; page-break-after:always; break-after:page; }
+    .hoja:last-child, .eti4x2:last-child{ page-break-after:auto; break-after:auto; }
+  }
+</style>
+<style id="tamPagina">@page{ size: letter portrait; margin:0; }</style>
+</head>
+<body>
+<div class="controles" id="controles">
+  <h1 id="titulo">Etiquetas VAROSA</h1>
+  <p id="info">Cargando…</p>
+  <button type="button" id="btnImprimir">🖨️ Imprimir</button>
+  <div class="config" id="config"></div>
+</div>
+<div id="hojas"></div>
+
+<script>
+(function(){
+  function esc(t){
+    return String(t == null ? "" : t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function leerDatos(){
+    var p = new URLSearchParams(window.location.search);
+    var d = p.get("d") || "";
+    if(!d){ return null; }
+    var b64 = d.replace(/-/g,"+").replace(/_/g,"/");
+    while(b64.length % 4){ b64 += "="; }
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++){ bytes[i] = bin.charCodeAt(i); }
+    return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+  }
+  function error(msg){
+    document.getElementById("controles").style.display = "none";
+    var e = document.createElement("div");
+    e.className = "error";
+    e.innerHTML = msg;
+    document.body.insertBefore(e, document.getElementById("hojas"));
+  }
+  function entero(v, def, max){
+    var n = parseInt(v, 10);
+    if(isNaN(n) || n < 1){ n = def; }
+    return Math.min(n, max);
+  }
+  function fechaHoy(){
+    var a = new Date();
+    return a.toLocaleDateString("es-CR") + " " + a.toLocaleTimeString("es-CR", { hour:"2-digit", minute:"2-digit" });
+  }
+
+  /* reparte bloques en hojas: 2 por hoja (media) o 4 (cuarto) */
+  function enHojas(bloques, porHoja){
+    var h = "";
+    for(var i=0;i<bloques.length;i+=porHoja){
+      h += '<div class="hoja' + (porHoja === 4 ? ' cuartos' : '') + '">';
+      for(var k=0;k<porHoja;k++){
+        var b = bloques[i+k];
+        var cls = porHoja === 4 ? "cuarto" : "media";
+        h += b ? '<div class="' + cls + '">' + b + '</div>' : '<div class="' + cls + ' vacia"></div>';
+      }
+      h += '</div>';
+    }
+    return h;
+  }
+
+  /* ================= ENCOMIENDA ================= */
+  function encomienda(D){
+    var r = D.remitente || {}, d = D.destinatario || {};
+    var total = entero(D.bultos, 1, 200);
+    var bloques = [];
+    for(var n=1;n<=total;n++){
+      var h = '<div class="enc-cab"><div><div class="marca">VAROSA</div><div class="sub">Encomienda · ' + esc(D.fecha || fechaHoy()) +
+              (D.documento ? ' · ' + esc(D.documento) : '') + '</div></div>' +
+              '<div class="bulto"><small>BULTO</small><b>' + n + '</b><small>DE ' + total + '</small></div></div>';
+      h += '<div class="enc-cuerpo">';
+      h += '<div class="bloque"><div class="rot">Envía</div><div class="nom">' + esc(r.nombre) + '</div>' +
+           (r.direccion ? '<div class="lin">' + esc(r.direccion) + '</div>' : '') +
+           (r.telefono ? '<div class="lin tel">Tel. ' + esc(r.telefono) + '</div>' : '') + '</div>';
+      h += '<div class="bloque dest"><div class="rot">Recibe</div><div class="nom">' + esc(d.nombre) + '</div>' +
+           (d.atencion ? '<div class="lin">Atención: ' + esc(d.atencion) + '</div>' : '') +
+           (d.direccion ? '<div class="lin">' + esc(d.direccion) + '</div>' : '') +
+           (d.lugar ? '<div class="lin"><b>' + esc(d.lugar) + '</b></div>' : '') +
+           (d.telefono ? '<div class="lin tel">Tel. ' + esc(d.telefono) + '</div>' : '') + '</div>';
+      h += '</div>';
+      h += '<div class="enc-pie">';
+      if(D.transporte){ h += '<div class="dato"><div class="rot">Transporte</div><div class="v">' + esc(D.transporte) + '</div></div>'; }
+      if(D.guia){ h += '<div class="dato"><div class="rot">Guía</div><div class="v">' + esc(D.guia) + '</div></div>'; }
+      if(D.fragil){ h += '<div class="fragil">FRÁGIL</div>'; }
+      h += '</div>';
+      if(D.notas){ h += '<div class="notas">' + esc(D.notas) + '</div>'; }
+      bloques.push(h);
+    }
+    document.getElementById("titulo").textContent = "Encomienda · " + (d.nombre || "");
+    document.getElementById("info").innerHTML = "📦 <b>" + total + "</b> etiqueta" + (total===1?"":"s") +
+      " en " + Math.ceil(total/2) + " hoja" + (Math.ceil(total/2)===1?"":"s") + " carta (2 por hoja). Cortá por la línea punteada.";
+    return enHojas(bloques, 2);
+  }
+
+  /* ================= NORTEÑAS ================= */
+  function nortenas(D){
+    var prods = Array.isArray(D.productos) ? D.productos : [];
+    var porHoja = (D.tamano === "cuarto") ? 4 : 2;
+    var bloques = [], sinReg = 0;
+    for(var i=0;i<prods.length;i++){
+      var P = prods[i];
+      var copias = entero(P.copias, 1, 100);
+      if(!P.registro){ sinReg++; }
+      for(var c=0;c<copias;c++){
+        var h = '<div class="nt"><div class="nt-cab"><div class="marca">VAROSA</div><div class="sub">' + esc(D.cliente || "") + '</div></div>' +
+                '<div class="nt-prod">' + esc(P.producto) + '</div>' +
+                '<div class="nt-reg"><div class="rot">Registro Ministerio de Salud</div><div class="v' + (P.registro ? '' : ' falta') + '">' +
+                  (P.registro ? esc(P.registro) : 'SIN REGISTRO') + '</div></div>' +
+                '<div class="nt-grid">' +
+                  (P.marca ? '<div><b>Marca</b>' + esc(P.marca) + '</div>' : '') +
+                  (P.sku ? '<div><b>Código</b>' + esc(P.sku) + '</div>' : '') +
+                  (P.lote ? '<div><b>Lote</b>' + esc(P.lote) + '</div>' : '') +
+                  (P.vence ? '<div><b>Vence</b>' + esc(P.vence) + '</div>' : '') +
+                  (D.documento ? '<div><b>Documento</b>' + esc(D.documento) + '</div>' : '') +
+                '</div>' +
+                '<div class="nt-pie">Distribuye: Comercializadora VAROSA S.A. · ' + esc(D.fecha || fechaHoy()) + '</div></div>';
+        bloques.push(h);
+      }
+    }
+    if(bloques.length === 0){ return null; }
+    document.getElementById("titulo").textContent = "Norteñas · registro sanitario";
+    document.getElementById("info").innerHTML = "🧪 <b>" + bloques.length + "</b> etiqueta" + (bloques.length===1?"":"s") +
+      ", " + porHoja + " por hoja carta." + (sinReg > 0 ? ' <b style="color:#b3261e">' + sinReg + ' producto(s) sin registro.</b>' : '');
+    return enHojas(bloques, porHoja);
+  }
+
+  /* ================= TEXTO LIBRE ================= */
+  function libre(D){
+    var texto = String(D.texto || "").trim();
+    if(texto === ""){ return null; }
+    var copias = entero(D.copias, 1, 100);
+    var tam = D.tamano || "media";
+    var largo = texto.length;
+    var h = "";
+    if(tam === "4x2"){
+      document.getElementById("tamPagina").textContent = "@page{ size: 101.6mm 50.8mm; margin:0; }";
+      var fs = largo <= 7 ? 20 : (largo <= 14 ? 12 : (largo <= 30 ? 8 : 5.5));
+      for(var i=0;i<copias;i++){
+        h += '<div class="eti4x2"><div class="libre" style="font-size:' + fs + 'mm">' + esc(texto) + '</div></div>';
+      }
+      document.getElementById("config").innerHTML = "<b>Impresora de etiquetas:</b> Tamaño = User defined (101.6 × 50.8 mm) · Márgenes = Ninguno · Escala = 100%";
+    } else if(tam === "carta"){
+      var fs2 = largo <= 7 ? 48 : (largo <= 14 ? 30 : (largo <= 30 ? 20 : 13));
+      for(var j=0;j<copias;j++){
+        h += '<div class="hoja"><div class="completa"><div class="libre" style="font-size:' + fs2 + 'mm">' + esc(texto) + '</div></div></div>';
+      }
+    } else {
+      var fs3 = largo <= 7 ? 34 : (largo <= 14 ? 22 : (largo <= 30 ? 14 : 9));
+      var bl = [];
+      for(var k=0;k<copias;k++){
+        bl.push('<div style="flex:1;display:flex;align-items:center;justify-content:center;"><div class="libre" style="font-size:' + fs3 + 'mm">' + esc(texto) + '</div></div>');
+      }
+      h = enHojas(bl, 2);
+    }
+    document.getElementById("titulo").textContent = "Etiqueta: " + texto;
+    document.getElementById("info").innerHTML = "🏷 <b>" + copias + "</b> copia" + (copias===1?"":"s") + " · " +
+      (tam === "4x2" ? "impresora de etiquetas 4×2\"" : (tam === "carta" ? "hoja carta completa" : "media carta (2 por hoja)"));
+    return h;
+  }
+
+  var D = null;
+  try{ D = leerDatos(); }catch(e){ D = null; }
+  if(!D){
+    error("<b>Esta página no recibió datos.</b> Se abre desde la pantalla <b>Etiquetas</b> de la app de Picking.");
+    return;
+  }
+  var html = null;
+  if(D.tipo === "encomienda"){ html = encomienda(D); }
+  else if(D.tipo === "nortenas"){ html = nortenas(D); }
+  else if(D.tipo === "libre"){ html = libre(D); }
+  if(!html){
+    error("<b>No hay nada para imprimir.</b> Revisá los datos en la pantalla Etiquetas y volvé a intentar.");
+    return;
+  }
+  document.getElementById("hojas").innerHTML = html;
+  if(D.tipo !== "libre" || D.tamano !== "4x2"){
+    document.getElementById("config").innerHTML = "<b>Impresora Epson:</b> Papel = Carta · Márgenes = Ninguno · Escala = 100% · Encabezados y pies de página = desactivados.";
+  }
+  document.getElementById("btnImprimir").onclick = function(){ window.print(); };
+})();
+</script>
+</body>
+</html>
